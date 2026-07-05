@@ -1,0 +1,43 @@
+name: Update Kaspa News Feed
+
+on:
+  schedule:
+    # Runs every 6 hours. Adjust cron to taste — GitHub's scheduler is not
+    # precise-to-the-minute, treat this as "roughly every 6 hours".
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write   # needed so the workflow can commit data/news.json back to the repo
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts
+
+      - name: Generate news from new videos
+        working-directory: scripts
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_HANDLE: ${{ vars.YOUTUBE_CHANNEL_HANDLE || 'KaspaWojak' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node generate-news.mjs
+
+      - name: Commit updated feed
+        run: |
+          git config user.name "kasbullet-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/news.json
+          git diff --quiet --cached || git commit -m "chore: update news feed from KaspaWojak channel"
+          git push

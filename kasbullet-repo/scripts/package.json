@@ -1,0 +1,14 @@
+{
+  "name": "kasbullet-news-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pulls new KaspaWojak uploads, summarizes them with Claude, updates data/news.json",
+  "scripts": {
+    "generate": "node generate-news.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "youtube-transcript": "^1.2.1"
+  }
+}
