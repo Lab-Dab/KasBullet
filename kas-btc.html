@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KAS vs BTC — KasBullet Macro Intelligence</title>
+  <meta name="description" content="Institutional-grade comparison of Kaspa vs Bitcoin performance, correlation analysis, and market metrics.">
+  <style>
+    /* ========== DESIGN SYSTEM ========== */
+    :root {
+      --bg: #050707;
+      --bg-secondary: #0a0c0c;
+      --card: #0e1313;
+      --card-border: rgba(112,199,186,0.10);
+      --text: #f2f5f4;
+      --text-secondary: #c9ccc9;
+      --muted: #8a9795;
+      --muted-dim: #536360;
+      --teal: #70c7ba;
+      --teal-bright: #49eacb;
+      --teal-dim: #2a9d8f;
+      --red: #ff6b6b;
+      --green: #51cf66;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.25);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.3);
+      --spacing-xs: 0.375rem;
+      --spacing-sm: 0.75rem;
+      --spacing-md: 1.25rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      --border-radius-sm: 6px;
+      --border-radius-md: 10px;
+      --border-radius-lg: 12px;
+      --transition-fast: 0.15s ease;
+      --transition-smooth: 0.3s ease;
+    }
+
+    body.light {
+      --bg: #f5f9f8;
+      --bg-secondary: #f0f5f4;
+      --card: #ffffff;
+      --card-border: rgba(15,60,53,0.12);
+      --text: #12211e;
+      --text-secondary: #3a4c48;
+      --muted: #55645f;
+      --muted-dim: #7c8b87;
+      --teal: #1f8f7f;
+      --teal-bright: #0d7566;
+      --teal-dim: #0a5c4e;
+      --red: #d63031;
+    }
+
+    * { box-sizing: border-box; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color var(--transition-smooth), color var(--transition-smooth);
+    }
+
+    /* ========== HEADER ========== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5,7,7,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.9rem 1.5rem;
+    }
+
+    body.light header {
+      background: rgba(245,249,248,0.92);
+    }
+
+    header .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .breadcrumb a {
+      color: var(--teal-bright);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .breadcrumb a:hover {
+      color: var(--teal-bright);
+    }
+
+    .breadcrumb-sep {
+      color: var(--muted-dim);
+      opacity: 0.6;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .header-button:hover {
+      background: var(--teal);
+      color: #051010;
+      border-color: var(--teal);
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(25deg) scale(1.1);
+      background: var(--teal);
+    }
+
+    /* ========== PAGE TITLE SECTION ========== */
+    .page-title-section {
+      background: linear-gradient(135deg, rgba(73,234,203,0.05) 0%, rgba(112,199,186,0.02) 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 2.5rem 1.5rem;
+    }
+
+    .page-title-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-title-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title-left h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .star-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--teal-bright);
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .star-btn:hover {
+      background: var(--teal);
+      color: #051010;
+      border-color: var(--teal);
+    }
+
+    .page-title-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      margin: 0;
+      line-height: 1.5;
+      max-width: 600px;
+    }
+
+    /* ========== METRIC CARDS GRID ========== */
+    section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .metric-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all var(--transition-smooth);
+      height: 140px;
+      justify-content: space-between;
+    }
+
+    .metric-card:hover {
+      border-color: var(--teal);
+      box-shadow: 0 4px 16px rgba(73,234,203,0.08);
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-dim);
+      font-weight: 600;
+    }
+
+    .metric-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .metric-change {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .metric-change.positive {
+      color: var(--green);
+    }
+
+    .metric-change.negative {
+      color: var(--red);
+    }
+
+    /* ========== MAIN CHART SECTION ========== */
+    .chart-section {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .chart-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .chart-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .timeframe-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      padding: 0.55rem 1rem;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .timeframe-btn:hover {
+      color: var(--teal-bright);
+      border-color: var(--teal);
+    }
+
+    .timeframe-btn.active {
+      background: var(--teal);
+      color: #051010;
+      border-color: var(--teal);
+    }
+
+    .chart-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-icon-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all var(--transition-fast);
+    }
+
+    .chart-icon-btn:hover {
+      color: var(--teal-bright);
+      border-color: var(--teal);
+      background: rgba(73,234,203,0.08);
+    }
+
+    .chart-container-wrapper {
+      position: relative;
+      height: 520px;
+      margin-bottom: 1rem;
+      border-radius: var(--border-radius-md);
+      overflow: hidden;
+    }
+
+    #comparisonChart {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .chart-note {
+      font-size: 0.8rem;
+      color: var(--muted-dim);
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+      line-height: 1.5;
+    }
+
+    /* ========== TWO-COLUMN LAYOUT ========== */
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .layout-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ========== PERFORMANCE SUMMARY TABLE ========== */
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem;
+    }
+
+    .summary-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 1.5rem;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .summary-table tr {
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .summary-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .summary-table td {
+      padding: 1rem 0;
+      vertical-align: middle;
+    }
+
+    .summary-period {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      width: 80px;
+    }
+
+    .summary-metric {
+      text-align: right;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      min-width: 90px;
+    }
+
+    .summary-metric.outperforming {
+      color: var(--green);
+    }
+
+    .summary-metric.underperforming {
+      color: var(--red);
+    }
+
+    /* ========== KEY RATIOS CARD ========== */
+    .ratios-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .ratio-item {
+      padding: 1rem;
+      background: rgba(73,234,203,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .ratio-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-dim);
+      font-weight: 600;
+    }
+
+    .ratio-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--teal-bright);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ========== THREE-COLUMN BOTTOM CARDS ========== */
+    .bottom-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .bottom-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card-title-small {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    /* ========== HISTORICAL PRICES ========== */
+    .historical-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .historical-table th {
+      background: rgba(73,234,203,0.06);
+      text-align: left;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--card-border);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-dim);
+    }
+
+    .historical-table td {
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--card-border);
+      vertical-align: middle;
+    }
+
+    .historical-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .historical-label {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .historical-price {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    /* ========== GROWTH COMPARISON ========== */
+    .growth-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .growth-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .growth-item:last-child {
+      border-bottom: none;
+    }
+
+    .growth-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .growth-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .growth-value.positive {
+      color: var(--green);
+    }
+
+    .growth-value.negative {
+      color: var(--red);
+    }
+
+    /* ========== PERFORMANCE INSIGHTS ========== */
+    .insights-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .insight-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .insight-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(73,234,203,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .insight-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .insight-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--teal-bright);
+    }
+
+    .insight-text {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--muted-dim);
+      font-size: 0.85rem;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      section {
+        padding: 1.75rem 1.25rem;
+      }
+
+      .page-title-section {
+        padding: 1.75rem 1.25rem;
+      }
+
+      .page-title-left h1 {
+        font-size: 1.8rem;
+      }
+
+      .page-title-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .metric-cards-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .chart-container-wrapper {
+        height: 380px;
+      }
+
+      .chart-controls {
+        width: 100%;
+      }
+
+      .ratios-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <div class="header-left">
+      <nav class="breadcrumb">
+        <a href="/">Markets</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>KAS vs BTC</span>
+      </nav>
+    </div>
+    <div class="header-right">
+      <button class="header-button" id="share-btn">
+        <span>↗</span> Share
+      </button>
+      <button class="header-button" id="since-launch-btn">
+        📅 Since Launch
+      </button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light and dark theme">☀️</button>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="page-title-section">
+  <div class="page-title-container">
+    <div class="page-title-header">
+      <div class="page-title-left">
+        <h1>
+          KAS vs BTC
+          <button class="star-btn" title="Add to watchlist">☆</button>
+        </h1>
+      </div>
+    </div>
+    <p class="page-title-desc">Compare Kaspa performance against Bitcoin from launch to present.</p>
+  </div>
+</section>
+
+<!-- METRIC CARDS -->
+<section>
+  <div class="metric-cards-grid">
+    <div class="metric-card">
+      <div class="metric-label">KAS Price</div>
+      <div class="metric-value" id="kas-price">—</div>
+      <div class="metric-change" id="kas-price-change">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">BTC Price</div>
+      <div class="metric-value" id="btc-price">—</div>
+      <div class="metric-change" id="btc-price-change">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">KAS Since Launch</div>
+      <div class="metric-value" id="kas-return">—</div>
+      <div style="font-size: 0.75rem; color: var(--muted-dim);">2022-11-07</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">BTC Since Launch</div>
+      <div class="metric-value" id="btc-return">—</div>
+      <div style="font-size: 0.75rem; color: var(--muted-dim);">2009-01-03</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">KAS / BTC Ratio</div>
+      <div class="metric-value" id="kas-btc-ratio">—</div>
+      <div style="font-size: 0.75rem; color: var(--muted-dim);">Market Price</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Correlation (1Y)</div>
+      <div class="metric-value" id="correlation">—</div>
+      <div style="font-size: 0.75rem; color: var(--muted-dim);" id="correlation-status">Low</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CHART -->
+<section>
+  <div class="chart-section">
+    <div class="chart-header">
+      <h2 class="chart-title">Price Performance Since Launch</h2>
+      <div class="chart-controls">
+        <button class="timeframe-btn" data-timeframe="7d">7D</button>
+        <button class="timeframe-btn" data-timeframe="1m">1M</button>
+        <button class="timeframe-btn" data-timeframe="3m">6M</button>
+        <button class="timeframe-btn" data-timeframe="1y">1Y</button>
+        <button class="timeframe-btn" data-timeframe="all">ALL</button>
+        <div class="chart-actions">
+          <button class="chart-icon-btn" id="chart-reset-btn" title="Reset zoom">↺</button>
+          <button class="chart-icon-btn" id="share-chart-btn" title="Share chart">⤴</button>
+        </div>
+      </div>
+    </div>
+    <div class="chart-container-wrapper">
+      <canvas id="comparisonChart"></canvas>
+    </div>
+    <div class="chart-note">
+      Note: Performance is normalized to respective launch prices. KAS launch: 2022-11-07 | BTC launch: 2009-01-03
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE SUMMARY & KEY RATIOS -->
+<section>
+  <div class="layout-2col">
+    <!-- Performance Summary Table -->
+    <div class="summary-card">
+      <h3 class="summary-title">Performance Summary</h3>
+      <table class="summary-table">
+        <tbody>
+          <tr>
+            <td class="summary-period">7D</td>
+            <td class="summary-metric" id="sum-kas-7d">—</td>
+            <td class="summary-metric" id="sum-btc-7d">—</td>
+            <td class="summary-metric" id="outperf-7d">—</td>
+          </tr>
+          <tr>
+            <td class="summary-period">30D</td>
+            <td class="summary-metric" id="sum-kas-30d">—</td>
+            <td class="summary-metric" id="sum-btc-30d">—</td>
+            <td class="summary-metric" id="outperf-30d">—</td>
+          </tr>
+          <tr>
+            <td class="summary-period">1Y</td>
+            <td class="summary-metric" id="sum-kas-1y">—</td>
+            <td class="summary-metric" id="sum-btc-1y">—</td>
+            <td class="summary-metric" id="outperf-1y">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Ratios -->
+    <div class="summary-card">
+      <h3 class="summary-title">Key Ratios</h3>
+      <div class="ratios-grid">
+        <div class="ratio-item">
+          <div class="ratio-label">KAS / BTC</div>
+          <div class="ratio-value" id="ratio-kasbtc">—</div>
+        </div>
+        <div class="ratio-item">
+          <div class="ratio-label">Mkt Cap Ratio</div>
+          <div class="ratio-value" id="ratio-mcap">—</div>
+        </div>
+        <div class="ratio-item">
+          <div class="ratio-label">Volatility KAS</div>
+          <div class="ratio-value" id="ratio-vol-kas">—</div>
+        </div>
+        <div class="ratio-item">
+          <div class="ratio-label">Volatility BTC</div>
+          <div class="ratio-value" id="ratio-vol-btc">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CARDS (Historical, Growth, Insights) -->
+<section>
+  <div class="bottom-cards">
+    <!-- Historical Prices -->
+    <div class="bottom-card">
+      <h4 class="card-title-small">Historical Prices</h4>
+      <table class="historical-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>KAS Price</th>
+            <th>BTC Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="historical-label">Launch</td>
+            <td class="historical-price" id="hist-kas-launch">—</td>
+            <td class="historical-price" id="hist-btc-launch">—</td>
+          </tr>
+          <tr>
+            <td class="historical-label">1 Year</td>
+            <td class="historical-price" id="hist-kas-1y">—</td>
+            <td class="historical-price" id="hist-btc-1y">—</td>
+          </tr>
+          <tr>
+            <td class="historical-label">ATH</td>
+            <td class="historical-price" id="hist-kas-ath">—</td>
+            <td class="historical-price" id="hist-btc-ath">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Growth Comparison -->
+    <div class="bottom-card">
+      <h4 class="card-title-small">Growth Comparison</h4>
+      <div class="growth-items">
+        <div class="growth-item">
+          <div class="growth-label">KAS Since Launch</div>
+          <div class="growth-value positive" id="growth-kas">—</div>
+        </div>
+        <div class="growth-item">
+          <div class="growth-label">BTC Since Launch</div>
+          <div class="growth-value" id="growth-btc">—</div>
+        </div>
+        <div class="growth-item">
+          <div class="growth-label">Outperformance</div>
+          <div class="growth-value positive" id="growth-outperf">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Insights -->
+    <div class="bottom-card">
+      <h4 class="card-title-small">Performance Insights</h4>
+      <div class="insights-list">
+        <div class="insight-item">
+          <div class="insight-icon">↗</div>
+          <div class="insight-content">
+            <div class="insight-title">Performance</div>
+            <div class="insight-text" id="insight-performance">Analyzing performance data…</div>
+          </div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">🔗</div>
+          <div class="insight-content">
+            <div class="insight-title">Correlation</div>
+            <div class="insight-text" id="insight-correlation">Analyzing correlation data…</div>
+          </div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon">📊</div>
+          <div class="insight-content">
+            <div class="insight-title">Volatility</div>
+            <div class="insight-text" id="insight-volatility">Analyzing volatility data…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>KasBullet — Institutional-grade macro intelligence for Kaspa.</p>
+  <p>Data via CoinGecko • Not financial advice</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.1.0/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="comparison.js"></script>
+
+<script>
+  // Theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const body = document.body;
+  
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('light');
+    themeToggle.textContent = body.classList.contains('light') ? '🌙' : '☀️';
+    localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+  });
+  
+  if (localStorage.getItem('theme') === 'light') {
+    body.classList.add('light');
+    themeToggle.textContent = '🌙';
+  }
+
+  // Share functionality
+  document.getElementById('share-btn').addEventListener('click', async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: 'KAS vs BTC Comparison',
+        text: 'Compare Kaspa performance against Bitcoin',
+        url: url,
+      });
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+      } catch {
+        alert('Share link: ' + url);
+      }
+    }
+  });
+
+  // Enhanced UI updates for bottom cards
+  const originalUpdateMetricCards = UIController.updateMetricCards;
+  UIController.updateMetricCards = function(metrics) {
+    originalUpdateMetricCards.call(this, metrics);
+    
+    if (metrics) {
+      const corr = metrics.corr1y || 0;
+      let status = 'Low';
+      if (corr > 0.7) status = 'High';
+      else if (corr > 0.3) status = 'Moderate';
+      document.getElementById('correlation-status').textContent = status;
+
+      const formatPrice = (n) => '$' + n.toLocaleString('en-US', {
+        minimumFractionDigits: n < 1 ? 4 : 2,
+        maximumFractionDigits: n < 1 ? 5 : 2,
+      });
+
+      if (metrics.kasRawPrices && metrics.kasRawPrices.length > 0) {
+        document.getElementById('hist-kas-launch').textContent = formatPrice(metrics.kasRawPrices[0]);
+        document.getElementById('hist-btc-launch').textContent = formatPrice(metrics.btcRawPrices[0]);
+        
+        const kasMax = Math.max(...metrics.kasRawPrices);
+        const btcMax = Math.max(...metrics.btcRawPrices);
+        document.getElementById('hist-kas-ath').textContent = formatPrice(kasMax);
+        document.getElementById('hist-btc-ath').textContent = formatPrice(btcMax);
+      }
+
+      document.getElementById('growth-kas').textContent = (metrics.kasReturn >= 0 ? '+' : '') + metrics.kasReturn.toFixed(1) + '%';
+      document.getElementById('growth-btc').textContent = (metrics.btcReturn >= 0 ? '+' : '') + metrics.btcReturn.toFixed(1) + '%';
+      document.getElementById('growth-outperf').textContent = (metrics.outperformance >= 0 ? '+' : '') + metrics.outperformance.toFixed(1) + '%';
+
+      document.getElementById('growth-kas').className = metrics.kasReturn >= 0 ? 'growth-value positive' : 'growth-value negative';
+      document.getElementById('growth-btc').className = metrics.btcReturn >= 0 ? 'growth-value positive' : 'growth-value negative';
+      document.getElementById('growth-outperf').className = metrics.outperformance >= 0 ? 'growth-value positive' : 'growth-value negative';
+
+      document.getElementById('insight-performance').textContent = InsightGenerator.generatePerformanceInsight(metrics);
+      document.getElementById('insight-correlation').textContent = InsightGenerator.generateCorrelationInsight(metrics, '1y');
+      document.getElementById('insight-volatility').textContent = InsightGenerator.generateVolatilityInsight(metrics);
+    }
+  };
+
+  const originalUpdateGrowthComparison = UIController.updateGrowthComparison;
+  UIController.updateGrowthComparison = function(metrics) {
+    originalUpdateGrowthComparison.call(this, metrics);
+    
+    if (metrics) {
+      const calc7d = () => {
+        if (metrics.kasRawPrices.length < 8) return { kas: 0, btc: 0 };
+        return {
+          kas: ComparisonService.calcReturn(
+            metrics.kasRawPrices[metrics.kasRawPrices.length - 8],
+            metrics.kasRawPrices[metrics.kasRawPrices.length - 1]
+          ),
+          btc: ComparisonService.calcReturn(
+            metrics.btcRawPrices[metrics.btcRawPrices.length - 8],
+            metrics.btcRawPrices[metrics.btcRawPrices.length - 1]
+          ),
+        };
+      };
+
+      const calc30d = () => {
+        if (metrics.kasRawPrices.length < 31) return { kas: 0, btc: 0 };
+        return {
+          kas: ComparisonService.calcReturn(
+            metrics.kasRawPrices[metrics.kasRawPrices.length - 31],
+            metrics.kasRawPrices[metrics.kasRawPrices.length - 1]
+          ),
+          btc: ComparisonService.calcReturn(
+            metrics.btcRawPrices[metrics.btcRawPrices.length - 31],
+            metrics.btcRawPrices[metrics.btcRawPrices.length - 1]
+          ),
+        };
+      };
+
+      const p7d = calc7d();
+      const p30d = calc30d();
+
+      const formatPercent = (n) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+      
+      document.getElementById('sum-kas-7d').textContent = formatPercent(p7d.kas);
+      document.getElementById('sum-btc-7d').textContent = formatPercent(p7d.btc);
+      document.getElementById('outperf-7d').textContent = formatPercent(p7d.kas - p7d.btc);
+      document.getElementById('outperf-7d').className = 'summary-metric ' + (p7d.kas >= p7d.btc ? 'outperforming' : 'underperforming');
+
+      document.getElementById('sum-kas-30d').textContent = formatPercent(p30d.kas);
+      document.getElementById('sum-btc-30d').textContent = formatPercent(p30d.btc);
+      document.getElementById('outperf-30d').textContent = formatPercent(p30d.kas - p30d.btc);
+      document.getElementById('outperf-30d').className = 'summary-metric ' + (p30d.kas >= p30d.btc ? 'outperforming' : 'underperforming');
+
+      document.getElementById('sum-kas-1y').textContent = formatPercent(metrics.kasReturn);
+      document.getElementById('sum-btc-1y').textContent = formatPercent(metrics.btcReturn);
+      document.getElementById('outperf-1y').textContent = formatPercent(metrics.outperformance);
+      document.getElementById('outperf-1y').className = 'summary-metric ' + (metrics.outperformance >= 0 ? 'outperforming' : 'underperforming');
+    }
+  };
+
+  window.initComparison();
+</script>
+
+</body>
+</html>
