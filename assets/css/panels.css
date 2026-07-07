@@ -1,0 +1,183 @@
+/* ==========================================================
+   KASBULLET
+   Panels — the internal layout of each homepage panel.
+   The surrounding box (background, border, shadow) is the
+   reusable .module from layout.css; this file only arranges
+   the content inside each panel.
+   Version: 2.1
+========================================================== */
+
+
+/* ==========================================================
+   Market Intelligence Ribbon
+   Homepage priority 1. Five equal metric modules, each with a
+   title, primary value, trend and a short contextual status.
+========================================================== */
+
+.ribbon-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+
+    gap:var(--space-5);
+
+}
+
+.intel-metric{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:var(--space-2);
+
+}
+
+.intel-metric-title{
+
+    font-size:var(--font-xs);
+
+    font-weight:600;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+    color:var(--text-muted);
+
+}
+
+.intel-metric-value{
+
+    font-size:var(--font-xl);
+
+    font-weight:700;
+
+    line-height:1.1;
+
+    color:var(--text-primary);
+
+    font-variant-numeric:tabular-nums;
+
+}
+
+.intel-metric-status{
+
+    font-size:var(--font-xs);
+
+    color:var(--text-secondary);
+
+}
+
+
+/* ==========================================================
+   Compare toolbar
+   Homepage priority 2. A fixed KAS base compared against a
+   selectable benchmark, plus the timeframe selector.
+========================================================== */
+
+.compare-toolbar{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:var(--space-5);
+
+}
+
+.compare-pairing{
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:var(--space-3);
+
+}
+
+.compare-vs{
+
+    font-size:var(--font-sm);
+
+    font-weight:600;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+    color:var(--text-muted);
+
+}
+
+
+/* ==========================================================
+   Global Markets list
+   Homepage priority 4 (preserved). Styles the existing rows:
+   asset name / value / change.
+========================================================== */
+
+.market-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.market-row{
+
+    display:grid;
+
+    grid-template-columns:70px 1fr auto;
+
+    align-items:center;
+
+    gap:var(--space-4);
+
+    padding:var(--space-4) 0;
+
+    border-bottom:1px solid var(--border-color);
+
+}
+
+.market-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.market-row span:first-child{
+
+    font-weight:600;
+
+    color:var(--text-primary);
+
+}
+
+.market-row span:nth-child(2){
+
+    justify-self:end;
+
+    color:var(--text-secondary);
+
+    font-variant-numeric:tabular-nums;
+
+}
+
+.market-row span:last-child{
+
+    justify-self:end;
+
+    color:var(--text-muted);
+
+    font-variant-numeric:tabular-nums;
+
+}

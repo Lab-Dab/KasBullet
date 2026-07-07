@@ -1,0 +1,302 @@
+/* ==========================================================
+   KASBULLET
+   Components — small, reusable UI atoms shared across panels.
+   No panel-specific layout here; that lives in panels.css.
+   Version: 2.1
+========================================================== */
+
+
+/* ==========================================================
+   Visually hidden
+   Purpose:  content available to assistive tech but not shown
+   visually (accessible labels, the page <h1>).
+========================================================== */
+
+.visually-hidden{
+
+    position:absolute;
+
+    width:1px;
+
+    height:1px;
+
+    margin:-1px;
+
+    padding:0;
+
+    border:0;
+
+    overflow:hidden;
+
+    clip:rect(0 0 0 0);
+
+    white-space:nowrap;
+
+}
+
+
+/* ==========================================================
+   Module header
+   Purpose:  the title row at the top of every module.
+   Inputs:   an <h2> title + optional status element.
+========================================================== */
+
+.module-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:var(--space-4);
+
+    margin-bottom:var(--space-5);
+
+}
+
+.module-header h2{
+
+    font-size:var(--font-lg);
+
+    font-weight:600;
+
+    color:var(--text-primary);
+
+}
+
+
+/* ==========================================================
+   Module status
+   Purpose:  communicate data freshness / availability.
+   Inputs:   [data-status="live" | "unavailable"] (optional).
+   The dot is decorative; the text always states the status,
+   so meaning never depends on color alone.
+========================================================== */
+
+.module-status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:var(--space-2);
+
+    font-size:var(--font-xs);
+
+    font-weight:600;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+    color:var(--text-muted);
+
+}
+
+.module-status[data-status]::before{
+
+    content:"";
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+
+    background:currentColor;
+
+}
+
+.module-status[data-status="live"]{
+
+    color:var(--color-positive);
+
+}
+
+.module-status[data-status="unavailable"]{
+
+    color:var(--color-warning);
+
+}
+
+
+/* ==========================================================
+   Direction indicator
+   Purpose:  show a value's change with sign, arrow AND color
+   so it stays legible without relying on color (accessibility).
+   Inputs:   modifier .up | .down | .neutral
+========================================================== */
+
+.change{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:var(--space-1);
+
+    font-size:var(--font-sm);
+
+    font-weight:600;
+
+    font-variant-numeric:tabular-nums;
+
+}
+
+.change.neutral{
+
+    color:var(--text-muted);
+
+}
+
+.change.up{
+
+    color:var(--color-positive);
+
+}
+
+.change.down{
+
+    color:var(--color-negative);
+
+}
+
+.change.up::before{
+
+    content:"\25B2"; /* ▲ */
+
+    font-size:.7em;
+
+}
+
+.change.down::before{
+
+    content:"\25BC"; /* ▼ */
+
+    font-size:.7em;
+
+}
+
+
+/* ==========================================================
+   Asset chip
+   Purpose:  a fixed asset token, e.g. the "KAS" base in the
+   Compare toolbar.
+========================================================== */
+
+.asset-chip{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    padding:var(--space-2) var(--space-4);
+
+    font-size:var(--font-sm);
+
+    font-weight:700;
+
+    letter-spacing:.02em;
+
+    color:var(--color-primary);
+
+    background:var(--color-primary-soft);
+
+    border:1px solid var(--border-color);
+
+    border-radius:var(--radius-small);
+
+}
+
+
+/* ==========================================================
+   Select control
+   Purpose:  a styled dropdown used in toolbars. Pair with a
+   <label> (visually hidden where the layout implies meaning).
+========================================================== */
+
+.control-select{
+
+    padding:var(--space-2) var(--space-4);
+
+    font-size:var(--font-sm);
+
+    font-weight:500;
+
+    color:var(--text-primary);
+
+    background:var(--bg-surface);
+
+    border:1px solid var(--border-color);
+
+    border-radius:var(--radius-small);
+
+    cursor:pointer;
+
+    transition:border-color var(--transition-fast);
+
+}
+
+.control-select:hover{
+
+    border-color:var(--color-primary);
+
+}
+
+
+/* ==========================================================
+   Segmented control — timeframe selector
+   Purpose:  mutually exclusive choices (e.g. chart timeframe).
+   Inputs:   buttons with aria-pressed to mark the active one.
+========================================================== */
+
+.timeframes{
+
+    display:inline-flex;
+
+    gap:var(--space-1);
+
+    padding:var(--space-1);
+
+    background:var(--bg-surface);
+
+    border:1px solid var(--border-color);
+
+    border-radius:var(--radius-small);
+
+}
+
+.timeframe{
+
+    padding:var(--space-2) var(--space-4);
+
+    font-size:var(--font-sm);
+
+    font-weight:600;
+
+    color:var(--text-secondary);
+
+    border-radius:var(--radius-small);
+
+    transition:var(--transition-fast);
+
+}
+
+.timeframe:hover{
+
+    color:var(--text-primary);
+
+    background:var(--bg-surface-hover);
+
+}
+
+.timeframe[aria-pressed="true"]{
+
+    color:var(--bg-page);
+
+    background:var(--color-primary);
+
+}

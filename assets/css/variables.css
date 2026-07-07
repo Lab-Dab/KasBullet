@@ -1,0 +1,126 @@
+/* ==========================================================
+   KASBULLET DESIGN SYSTEM
+   Variables — the single source of truth for design tokens.
+
+   This file is frozen by convention: every color, font size,
+   space, radius, timing and z-index used anywhere in the
+   platform must be defined here and referenced by token.
+   Never hard-code these values elsewhere.
+   Version: 1.2
+========================================================== */
+
+:root {
+
+    /* ======================================================
+       Brand
+    ====================================================== */
+
+    --color-primary: #49EACB;
+    --color-primary-hover: #67F3D8;
+    --color-primary-soft: rgba(73, 234, 203, .12);
+
+    /* ======================================================
+       Semantic — market direction & states
+       Always paired in the UI with a sign, arrow or label so
+       meaning is never carried by color alone (accessibility).
+    ====================================================== */
+
+    --color-positive: #3FB950;
+    --color-positive-soft: rgba(63, 185, 80, .12);
+    --color-negative: #F85149;
+    --color-negative-soft: rgba(248, 81, 73, .12);
+
+    /* ======================================================
+       Warning — Neutral / Watch / Caution states
+    ====================================================== */
+
+    --color-warning: #F2C94C;
+    --color-warning-soft: rgba(242, 201, 76, .12);
+
+    /* ======================================================
+       Backgrounds
+    ====================================================== */
+
+    --bg-page: #0B0F14;
+    --bg-surface: #141A22;
+    --bg-surface-hover: #1A222D;
+
+    /* ======================================================
+       Borders
+    ====================================================== */
+
+    --border-color: #252F3D;
+
+    /* ======================================================
+       Typography — color
+    ====================================================== */
+
+    --text-primary: #F5F7FA;
+    --text-secondary: #9AA8B5;
+    --text-muted: #6C7A89;
+
+    /* ======================================================
+       Typography — scale
+    ====================================================== */
+
+    --font-xs: .75rem;
+    --font-sm: .875rem;
+    --font-md: 1rem;
+    --font-lg: 1.25rem;
+    --font-xl: 2rem;
+    --font-display: 3.5rem;
+
+    /* ======================================================
+       Layout
+    ====================================================== */
+
+    --container-width: 1600px;
+    --header-height: 80px;
+    --page-gutter: var(--space-6);
+
+    /* ======================================================
+       Spacing scale
+    ====================================================== */
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* ======================================================
+       Radius
+    ====================================================== */
+
+    --radius-small: 8px;
+    --radius-medium: 12px;
+    --radius-large: 18px;
+
+    /* ======================================================
+       Shadows
+    ====================================================== */
+
+    --shadow-panel: 0 10px 30px rgba(0, 0, 0, .30);
+
+    /* ======================================================
+       Layering — z-index scale
+       Avoids magic numbers as sticky headers, dropdowns,
+       modals and toasts are introduced.
+    ====================================================== */
+
+    --z-header: 100;
+    --z-dropdown: 500;
+    --z-modal: 1000;
+    --z-toast: 1500;
+
+    /* ======================================================
+       Animation
+    ====================================================== */
+
+    --transition-fast: .20s ease;
+    --transition-normal: .30s ease;
+
+}

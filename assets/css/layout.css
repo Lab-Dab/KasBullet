@@ -1,0 +1,232 @@
+/* ==========================================================
+   KASBULLET
+   Layout — page skeleton only: header, navigation, the page
+   container, the dashboard grid and the generic module box.
+   Panel-specific content lives in panels.css; reusable atoms
+   live in components.css.
+   Version: 3.0
+========================================================== */
+
+
+/* ==========================================================
+   Application
+========================================================== */
+
+body{
+
+    min-height:100vh;
+
+}
+
+
+/* ==========================================================
+   Header
+========================================================== */
+
+.app-header{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:var(--z-header);
+
+    width:100%;
+
+    background:rgba(11, 15, 20, .92);
+
+    backdrop-filter:blur(18px);
+
+    border-bottom:1px solid var(--border-color);
+
+}
+
+.header-container{
+
+    max-width:var(--container-width);
+
+    min-height:var(--header-height);
+
+    margin:0 auto;
+
+    padding:var(--space-3) var(--page-gutter);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:var(--space-4);
+
+}
+
+
+/* ==========================================================
+   Brand
+========================================================== */
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:var(--space-2);
+
+    user-select:none;
+
+}
+
+.brand-text{
+
+    font-size:var(--font-lg);
+
+    font-weight:700;
+
+    letter-spacing:-0.04em;
+
+    color:var(--text-primary);
+
+}
+
+.brand-mark{
+
+    width:24px;
+
+    height:24px;
+
+}
+
+
+/* ==========================================================
+   Navigation
+========================================================== */
+
+.main-nav{
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:var(--space-6);
+
+}
+
+.main-nav a{
+
+    position:relative;
+
+    font-size:var(--font-sm);
+
+    font-weight:500;
+
+    color:var(--text-secondary);
+
+    transition:color var(--transition-fast);
+
+}
+
+.main-nav a:hover{
+
+    color:var(--color-primary);
+
+}
+
+.main-nav a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-8px;
+
+    width:0;
+
+    height:2px;
+
+    background:var(--color-primary);
+
+    transition:width var(--transition-fast);
+
+}
+
+.main-nav a:hover::after,
+.main-nav a:focus-visible::after{
+
+    width:100%;
+
+}
+
+
+/* ==========================================================
+   Page container
+========================================================== */
+
+.dashboard{
+
+    max-width:var(--container-width);
+
+    margin:0 auto;
+
+    padding:var(--space-7) var(--page-gutter) var(--space-8);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:var(--space-7);
+
+}
+
+
+/* ==========================================================
+   Dashboard grid
+   Mobile-first: a single column by default. responsive.css
+   promotes it to a sidebar + main layout on wider screens.
+========================================================== */
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:var(--space-5);
+
+}
+
+
+/* ==========================================================
+   Generic module box
+========================================================== */
+
+.module{
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:var(--bg-surface);
+
+    border:1px solid var(--border-color);
+
+    border-radius:var(--radius-large);
+
+    padding:var(--space-6);
+
+    box-shadow:var(--shadow-panel);
+
+}
+
+.module-large{
+
+    min-height:520px;
+
+}
