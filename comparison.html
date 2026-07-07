@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KAS vs BTC Comparison — KasBullet</title>
+  <meta name="description" content="Compare Kaspa performance against Bitcoin from launch to present. Interactive normalized charts and detailed metrics.">
+  
+  <!-- Design System -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/comparison.css">
+  
+  <!-- Inline critical theme styles (from index.html) -->
+  <style>
+    :root {
+      --bg: #050707;
+      --card: #0e1313;
+      --card-border: rgba(112,199,186,0.10);
+      --text: #f2f5f4;
+      --muted: #8a9795;
+      --muted-dim: #536360;
+      --teal: #70c7ba;
+      --teal-bright: #49eacb;
+      --red: #ff6b6b;
+    }
+    body.light {
+      --bg: #f5f9f8;
+      --card: #ffffff;
+      --card-border: rgba(15,60,53,0.12);
+      --text: #12211e;
+      --muted: #55645f;
+      --muted-dim: #7c8b87;
+      --teal: #1f8f7f;
+      --teal-bright: #0d7566;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.5s ease, color 0.5s ease;
+      line-height: 1.6;
+    }
+    a { color: var(--teal-bright); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <svg width="120" height="40" viewBox="0 0 150 50" role="img" aria-label="KasBullet logo">
+        <defs>
+          <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f2f2f2"/>
+            <stop offset="45%" stop-color="#b9bdbd"/>
+            <stop offset="55%" stop-color="#9a9e9e"/>
+            <stop offset="100%" stop-color="#dcdcdc"/>
+          </linearGradient>
+          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="2.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <rect x="2" y="17" width="10" height="16" rx="2" fill="#6f7473"/>
+        <rect x="10" y="12" width="88" height="26" rx="13" fill="url(#metal)" stroke="#5f6362" stroke-width="1"/>
+        <path d="M96,12 L136,25 L96,38 Z" fill="url(#metal)" stroke="#5f6362" stroke-width="1"/>
+        <g filter="url(#glow)">
+          <path d="M46,17 L62,25 L46,33 L46,27 L54,25 L46,23 Z" fill="#1f8f7f"/>
+          <path d="M58,17 L74,25 L58,33 L58,27 L66,25 L58,23 Z" fill="#49eacb"/>
+        </g>
+      </svg>
+      <div>
+        <div class="brand-name">KasBullet</div>
+        <div class="brand-tag">Kaspa Macro Intelligence</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="index.html#charts">Charts</a>
+      <a href="index.html#network">Network</a>
+      <a href="index.html#news">News</a>
+      <a href="https://kaspawojak.myspreadshop.com/" target="_blank" rel="noopener" class="merch">🛍️ Merch</a>
+      <a href="index.html#subscribe" class="nav-cta">Subscribe</a>
+      <button class="toggle" id="theme-toggle" aria-label="Toggle light and dark theme">☀️</button>
+    </nav>
+  </header>
+
+  <main class="comparison-page">
+
+    <!-- COMPARISON HEADER -->
+    <section class="comparison-header">
+      <div class="comparison-header-left">
+        <div class="breadcrumb">
+          <a href="index.html">Dashboard</a>
+          <span>›</span>
+          <span>KAS vs BTC</span>
+        </div>
+        <h1>KAS vs BTC</h1>
+        <p class="comparison-subtitle">
+          Compare Kaspa performance against Bitcoin from launch to present.
+        </p>
+      </div>
+      <div class="comparison-actions">
+        <button id="share-btn" title="Share this comparison">📤 Share</button>
+        <button id="date-range-btn" title="Change date range">📅 Date Range</button>
+      </div>
+    </section>
+
+    <!-- METRIC GRID -->
+    <section class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">KAS Price</div>
+        <div class="metric-value" id="kas-price">—</div>
+        <div class="metric-change" id="kas-price-change"></div>
+        <div class="metric-meta">
+          <span class="metric-updated" id="kas-price-updated"></span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">BTC Price</div>
+        <div class="metric-value" id="btc-price">—</div>
+        <div class="metric-change" id="btc-price-change"></div>
+        <div class="metric-meta">
+          <span class="metric-updated" id="btc-price-updated"></span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">KAS Since Launch</div>
+        <div class="metric-value" id="kas-return">—</div>
+        <div class="metric-updated">From ICO</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">BTC Since Launch</div>
+        <div class="metric-value" id="btc-return">—</div>
+        <div class="metric-updated">From genesis</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">KAS/BTC Ratio</div>
+        <div class="metric-value" id="kas-btc-ratio">—</div>
+        <div class="metric-updated">Satoshi equiv.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Correlation (1Y)</div>
+        <div class="metric-value" id="correlation">—</div>
+        <div class="metric-updated">Price sync</div>
+      </div>
+    </section>
+
+    <!-- COMPARISON LAYOUT -->
+    <section class="comparison-layout">
+
+      <!-- MAIN CONTENT -->
+      <div class="comparison-main">
+
+        <!-- CHART CARD -->
+        <article class="comparison-chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">
+              KAS vs BTC
+              <span class="badge">Normalized</span>
+            </h2>
+          </div>
+          <div class="timeframe-controls">
+            <button class="timeframe-btn" data-timeframe="7d">7D</button>
+            <button class="timeframe-btn" data-timeframe="1m">1M</button>
+            <button class="timeframe-btn" data-timeframe="3m">3M</button>
+            <button class="timeframe-btn" data-timeframe="1y" class="active">1Y</button>
+            <button class="timeframe-btn" data-timeframe="all">ALL</button>
+          </div>
+          <div class="chart-container-inner">
+            <canvas id="comparisonChart"></canvas>
+          </div>
+          <div class="chart-footer">
+            <span>KAS launch: January 2022 · BTC genesis: January 2009</span>
+            <button class="chart-reset-btn" id="chart-reset-btn">↺ Reset Zoom</button>
+            <span>Data: CoinGecko</span>
+          </div>
+        </article>
+
+        <!-- BOTTOM GRID -->
+        <div class="comparison-bottom-grid">
+
+          <!-- HISTORICAL PRICES -->
+          <article class="bottom-card">
+            <h3>Historical Prices</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>KAS</th>
+                  <th>BTC</th>
+                </tr>
+              </thead>
+              <tbody id="historical-prices-tbody">
+                <tr>
+                  <td colspan="3" style="text-align: center; color: var(--muted-dim);">Loading…</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+
+          <!-- GROWTH COMPARISON -->
+          <article class="bottom-card">
+            <h3>Growth Comparison</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>KAS</th>
+                  <th>BTC</th>
+                </tr>
+              </thead>
+              <tbody id="growth-tbody">
+                <tr>
+                  <td>7 Days</td>
+                  <td id="kas-7d">—</td>
+                  <td id="btc-7d">—</td>
+                </tr>
+                <tr>
+                  <td>30 Days</td>
+                  <td id="kas-30d">—</td>
+                  <td id="btc-30d">—</td>
+                </tr>
+                <tr>
+                  <td>90 Days</td>
+                  <td id="kas-90d">—</td>
+                  <td id="btc-90d">—</td>
+                </tr>
+                <tr>
+                  <td>1 Year</td>
+                  <td id="kas-1y">—</td>
+                  <td id="btc-1y">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+
+          <!-- PERFORMANCE INSIGHTS -->
+          <article class="bottom-card">
+            <h3>Performance Insights</h3>
+            <div class="ratios-list" id="insights">
+              <div class="ratio-item">
+                <span class="ratio-label">Outperformance (1Y)</span>
+                <span class="ratio-value" id="outperformance">—</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Volatility (1Y)</span>
+                <span class="ratio-value" id="volatility">—</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Max Drawdown (1Y)</span>
+                <span class="ratio-value" id="max-drawdown">—</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Current Trend</span>
+                <span class="ratio-value" id="current-trend">—</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="comparison-sidebar">
+
+        <!-- PERFORMANCE SUMMARY -->
+        <article class="sidebar-card">
+          <h3>Performance Summary</h3>
+          <table>
+            <tbody id="performance-summary-tbody">
+              <tr>
+                <td style="color: var(--muted);">7D KAS</td>
+                <td id="sum-kas-7d" class="ratio-value">—</td>
+              </tr>
+              <tr>
+                <td style="color: var(--muted);">7D BTC</td>
+                <td id="sum-btc-7d" class="ratio-value">—</td>
+              </tr>
+              <tr>
+                <td style="color: var(--muted);">30D KAS</td>
+                <td id="sum-kas-30d" class="ratio-value">—</td>
+              </tr>
+              <tr>
+                <td style="color: var(--muted);">30D BTC</td>
+                <td id="sum-btc-30d" class="ratio-value">—</td>
+              </tr>
+              <tr>
+                <td style="color: var(--muted);">1Y KAS</td>
+                <td id="sum-kas-1y" class="ratio-value">—</td>
+              </tr>
+              <tr>
+                <td style="color: var(--muted);">1Y BTC</td>
+                <td id="sum-btc-1y" class="ratio-value">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- KEY RATIOS -->
+        <article class="sidebar-card">
+          <h3>Key Ratios</h3>
+          <div class="ratios-list">
+            <div class="ratio-item">
+              <span class="ratio-label">KAS/BTC</span>
+              <span class="ratio-value" id="ratio-kasbtc">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">Market Cap Ratio</span>
+              <span class="ratio-value" id="ratio-mcap">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">Correlation</span>
+              <span class="ratio-value" id="ratio-corr">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">Volatility KAS</span>
+              <span class="ratio-value" id="ratio-vol-kas">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">Volatility BTC</span>
+              <span class="ratio-value" id="ratio-vol-btc">—</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- MARKET STRUCTURE -->
+        <article class="sidebar-card">
+          <h3>Market Structure</h3>
+          <div class="ratios-list" id="market-structure">
+            <div class="ratio-item">
+              <span class="ratio-label">BTC Dominance</span>
+              <span class="ratio-value" id="btc-dominance">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">KAS Momentum</span>
+              <span class="ratio-value" id="kas-momentum">—</span>
+            </div>
+            <div class="ratio-item">
+              <span class="ratio-label">Regime</span>
+              <span class="ratio-value" id="regime">—</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- ABOUT COMPARISON -->
+        <article class="sidebar-card">
+          <h3>About</h3>
+          <p class="about-text">
+            This comparison normalizes both assets from a common starting point to visualize relative performance independent of absolute price.
+          </p>
+          <p class="about-text">
+            <strong>KAS</strong> launched January 2022 as Kaspa mainnet. <strong>BTC</strong> is the genesis cryptocurrency from 2009.
+          </p>
+        </article>
+
+        <!-- RELATED COMPARISONS -->
+        <article class="sidebar-card">
+          <h3>Related Comparisons</h3>
+          <div class="related-links">
+            <a href="#">KAS vs Gold</a>
+            <a href="#">KAS vs S&P 500</a>
+            <a href="#">KAS vs Nasdaq</a>
+            <a href="#">BTC vs Gold</a>
+          </div>
+        </article>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <p>KasBullet aggregates public data. Not financial advice.</p>
+    <p>© 2026</p>
+  </footer>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  
+  <!-- Comparison services and logic -->
+  <script src="assets/js/comparison.js"></script>
+
+  <script>
+    // ---------- theme toggle (shared with index.html) ----------
+    const toggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    function toggleTheme() {
+      body.classList.toggle('light');
+      toggle.textContent = body.classList.contains('light') ? '🌙' : '☀️';
+      localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+      if (window.comparisonChart) {
+        window.comparisonChart.destroy();
+        window.initComparison();
+      }
+    }
+    toggle.addEventListener('click', toggleTheme);
+    if (localStorage.getItem('theme') === 'light') {
+      body.classList.add('light');
+      toggle.textContent = '🌙';
+    }
+
+    // Initialize comparison on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => window.initComparison?.());
+    } else {
+      window.initComparison?.();
+    }
+  </script>
+
+</body>
+</html>
