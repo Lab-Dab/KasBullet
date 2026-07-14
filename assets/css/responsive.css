@@ -1,17 +1,6 @@
 /* ==========================================================
    KASBULLET
-   Responsive — the one place breakpoints live.
-   Base styles in the other files target mobile first; the
-   rules here progressively enhance the layout for larger
-   screens. No component styling is defined here, only the
-   adjustments that depend on viewport width.
-   Version: 1.0
-========================================================== */
-
-
-/* ==========================================================
-   Small screens — tighten the page gutter on phones so the
-   content keeps as much width as possible.
+   Responsive - breakpoint-only layout adjustments.
 ========================================================== */
 
 @media (max-width: 600px){
@@ -36,7 +25,8 @@
 
     }
 
-    .chart-toolbar{
+    .chart-toolbar,
+    .timeframe-group{
 
         width:100%;
 
@@ -48,9 +38,18 @@
 
     }
 
-    .chart-stats{
+    .chart-stats,
+    .intelligence-panel{
 
         grid-template-columns:1fr;
+
+    }
+
+    .intelligence-panel-header{
+
+        align-items:flex-start;
+
+        flex-direction:column;
 
     }
 
@@ -62,28 +61,16 @@
 
 }
 
-
-/* ==========================================================
-   Tablet and up — give the intelligence ribbon more breathing
-   room between its metric modules.
-========================================================== */
-
 @media (min-width: 768px){
 
-    .ribbon-grid{
+    .ribbon-grid,
+    .cycle-strip-grid{
 
         gap:var(--space-6);
 
     }
 
 }
-
-
-/* ==========================================================
-   Desktop and up — promote the dashboard to a sidebar + main
-   layout: Global Markets and Macro in the narrow column,
-   the featured chart and On-Chain in the wide column.
-========================================================== */
 
 @media (min-width: 1024px){
 
@@ -94,6 +81,12 @@
         gap:var(--space-6);
 
         align-items:start;
+
+    }
+
+    .cycle-strip{
+
+        grid-column:1 / -1;
 
     }
 

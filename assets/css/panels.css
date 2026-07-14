@@ -89,10 +89,19 @@
 
 }
 
+.timeframe-group{
+    display:inline-flex;
+    gap:var(--space-1);
+    padding:var(--space-1);
+    background:rgba(11, 15, 20, .55);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-small);
+}
+
 
 /* ==========================================================
-   Global Markets list
-   Homepage priority 4 (preserved). Styles the existing rows:
+   Market Snapshot list
+   Styles the existing rows:
    asset name / value / change.
 ========================================================== */
 
@@ -108,7 +117,7 @@
 
     display:grid;
 
-    grid-template-columns:70px 1fr auto;
+    grid-template-columns:92px 1fr auto;
 
     align-items:center;
 
@@ -160,6 +169,16 @@
 ========================================================== */
 
 .chart-panel{
+    gap:var(--space-5);
+}
+
+.cycle-strip{
+    gap:var(--space-5);
+}
+
+.cycle-strip-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
     gap:var(--space-5);
 }
 
@@ -230,8 +249,81 @@
 
 .stat-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns:1fr;
     gap:var(--space-4);
+}
+
+.intelligence-panel{
+    display:grid;
+    grid-template-columns:minmax(170px, .8fr) minmax(240px, 1.4fr) minmax(220px, 1fr) auto;
+    align-items:stretch;
+    gap:var(--space-4);
+}
+
+.intelligence-panel-header{
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:space-between;
+    gap:var(--space-4);
+    align-items:center;
+}
+
+.intelligence-panel-header h3{
+    font-size:var(--font-md);
+}
+
+.panel-headline,
+.panel-chart,
+.panel-insight,
+.feed-category{
+    padding:var(--space-4);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-medium);
+    background:rgba(11, 15, 20, .42);
+}
+
+.panel-headline,
+.panel-insight{
+    display:flex;
+    flex-direction:column;
+    gap:var(--space-2);
+}
+
+.panel-chart{
+    display:grid;
+    min-height:140px;
+    place-items:center;
+    color:var(--text-secondary);
+    border-style:dashed;
+}
+
+.panel-insight p{
+    font-size:var(--font-sm);
+}
+
+.expand-button{
+    align-self:end;
+}
+
+.feed-category-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+    gap:var(--space-4);
+    margin-bottom:var(--space-5);
+}
+
+.feed-category{
+    display:flex;
+    flex-direction:column;
+    gap:var(--space-2);
+}
+
+.feed-category h3{
+    font-size:var(--font-sm);
+}
+
+.feed-category p{
+    font-size:var(--font-xs);
 }
 
 .alerts-grid{

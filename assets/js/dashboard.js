@@ -5,10 +5,16 @@
   const ui = window.KasBulletComponents;
   let latestChartPoints = [];
 
-  const cryptoAssets = [
-    { label: "KAS", id: "kaspa" },
+  const marketSnapshotRows = [
     { label: "BTC", id: "bitcoin" },
     { label: "ETH", id: "ethereum" },
+    { label: "SOL" },
+    { label: "Gold" },
+    { label: "Silver" },
+    { label: "Oil" },
+    { label: "DXY" },
+    { label: "Global M2" },
+    { label: "Watchlist" },
   ];
 
   function field(name) {
@@ -71,17 +77,24 @@
       statusId: "ribbon-status",
       statusText: "Preparing data",
     });
-    ui.renderSectionHeader("global-markets-header", {
-      id: "global-markets-title",
-      title: "Global Markets",
-      statusId: "global-markets-status",
-      statusText: "Preparing markets",
+    ui.renderSectionHeader("market-snapshot-header", {
+      id: "market-snapshot-title",
+      title: "Market Snapshot",
+      statusId: "market-snapshot-status",
+      statusText: "Preparing snapshot",
     });
     ui.renderSectionHeader("primary-chart-header", {
       id: "primary-chart-title",
-      title: "Primary Interactive KAS Chart",
+      title: "Kaspa Market Terminal",
       statusId: "primary-chart-status",
       statusText: "Preparing chart",
+    });
+    ui.renderSectionHeader("cycle-strip-header", {
+      id: "cycle-strip-title",
+      title: "Cycle Strip",
+      statusId: "cycle-strip-status",
+      status: "unavailable",
+      statusText: "Models not enabled",
     });
     ui.renderSectionHeader("market-intelligence-header", {
       id: "market-intelligence-title",
@@ -108,19 +121,35 @@
       status: "unavailable",
       statusText: "Models not enabled",
     });
-    ui.renderSectionHeader("ai-executive-summary-header", {
-      id: "ai-executive-summary-title",
-      title: "AI Executive Summary",
-      statusId: "ai-executive-summary-status",
+    ui.renderSectionHeader("market-intelligence-summary-header", {
+      id: "market-intelligence-summary-title",
+      title: "Market Intelligence Summary",
+      statusId: "market-intelligence-summary-status",
       status: "unavailable",
-      statusText: "Engine not enabled",
+      statusText: "Factual summary",
     });
-    ui.renderSectionHeader("latest-alerts-header", {
-      id: "latest-alerts-title",
-      title: "Latest Alerts",
-      statusId: "latest-alerts-status",
-      statusText: "Preparing alerts",
+    ui.renderSectionHeader("market-intelligence-feed-header", {
+      id: "market-intelligence-feed-title",
+      title: "Market Intelligence Feed",
+      statusId: "market-intelligence-feed-status",
+      statusText: "Preparing feed",
     });
+  }
+
+  function renderChartToolbar() {
+    document.getElementById("chart-toolbar").innerHTML = [
+      ui.toolbarButton({ label: "Compare", disabled: true }),
+      ui.toolbarButton({ label: "Indicators", disabled: true }),
+      ui.toolbarButton({ label: "Drawing Tools", disabled: true }),
+      '<div class="timeframe-group" role="group" aria-label="KAS chart timeframe">',
+      '<button type="button" class="timeframe" data-timeframe="7" aria-pressed="false">1W</button>',
+      '<button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>',
+      '<button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>',
+      '<button type="button" class="timeframe" data-timeframe="365" aria-pressed="false">1Y</button>',
+      '</div>',
+      ui.toolbarButton({ label: "Chart Settings", disabled: true }),
+      ui.toolbarButton({ label: "Fullscreen", disabled: true }),
+    ].join("");
   }
 
   function renderInitialState() {
@@ -135,11 +164,19 @@
       ui.metricCard({ label: "Conviction", value: "Unavailable", note: "Future supply model container", field: "conviction" }),
     ].join("");
 
-    document.getElementById("global-markets").innerHTML = cryptoAssets.map((asset) =>
-      ui.marketRow({ label: asset.label, value: "Loading", change: "--" })
-    ).concat(["Gold", "Silver", "Oil", "Nasdaq", "S&P 500"].map((label) =>
-      ui.marketRow({ label, value: "Unavailable", change: "--" })
-    )).join("");
+    document.getElementById("market-snapshot").innerHTML = marketSnapshotRows.map((asset) =>
+      ui.marketRow({ label: asset.label, value: asset.id ? "Loading" : "Unavailable", change: "--" })
+    ).join("");
+
+    document.getElementById("cycle-strip-grid").innerHTML = [
+      "Cycle Score",
+      "Market Risk",
+      "Bottom Probability",
+      "Peak Probability",
+      "Conviction",
+      "Liquidity",
+      "Network Strength",
+    ].map((label) => ui.metricCard({ label, value: "Unavailable", note: "Future intelligence container" })).join("");
 
     document.getElementById("chart-stats").innerHTML = [
       ui.statCard({ label: "KAS Price", value: "Loading", source: "CoinGecko", field: "chartPrice" }),
@@ -147,55 +184,65 @@
       ui.statCard({ label: "24h Change", value: "Loading", source: "CoinGecko", field: "chartChange" }),
     ].join("");
 
-    document.getElementById("market-grid").innerHTML = [
-      ui.statCard({ label: "Price", value: "Loading", source: "CoinGecko", field: "marketPrice" }),
-      ui.statCard({ label: "Market Cap", value: "Loading", source: "CoinGecko", field: "marketCap" }),
-      ui.statCard({ label: "Volume", value: "Loading", source: "CoinGecko", field: "marketVolume" }),
-      ui.statCard({ label: "Dominance", value: "Loading", source: "Kaspa market cap / crypto market cap", field: "kaspaDominance" }),
-    ].join("");
+    document.getElementById("market-grid").innerHTML = ui.intelligencePanel({
+      title: "Market Intelligence",
+      headline: "Loading",
+      chartLabel: "Market intelligence interactive chart container",
+      insight: "Objective market context will render here when verified data is available.",
+      statusId: "market-panel-status",
+    });
 
-    document.getElementById("supply-grid").innerHTML = [
-      ui.statCard({ label: "Circulating Supply", value: "Loading", source: "CoinGecko", field: "circulatingSupply" }),
-      ui.statCard({ label: "Exchange Supply", value: "Unavailable", source: "Verified aggregate feed required" }),
-      ui.statCard({ label: "Dormant Supply", value: "Unavailable", source: "Future on-chain model container" }),
-      ui.statCard({ label: "Velocity", value: "Unavailable", source: "Future on-chain model container" }),
-    ].join("");
+    document.getElementById("supply-grid").innerHTML = ui.intelligencePanel({
+      title: "Supply Intelligence",
+      headline: "Loading",
+      chartLabel: "Supply intelligence interactive chart container",
+      insight: "Supply metrics remain limited to verified public data until additional providers are connected.",
+      statusId: "supply-panel-status",
+    });
 
-    document.getElementById("network-grid").innerHTML = [
-      ui.statCard({ label: "Block Rate", value: "10 BPS", source: "Kaspa Crescendo network target" }),
-      ui.statCard({ label: "Network Explorer", value: "kas.fyi", source: "Live chain detail" }),
-      ui.statCard({ label: "Hashrate Security", value: "Unavailable", source: "Verified provider required" }),
-      ui.statCard({ label: "Node Count", value: "Unavailable", source: "Verified provider required" }),
-    ].join("");
+    document.getElementById("network-grid").innerHTML = ui.intelligencePanel({
+      title: "Network Intelligence",
+      headline: "10 BPS",
+      chartLabel: "Network intelligence interactive chart container",
+      insight: "Network intelligence containers are ready for verified chain data.",
+      statusId: "network-panel-status",
+    });
 
-    document.getElementById("cycle-grid").innerHTML = [
-      ui.statCard({ label: "KasBullet Cycle Score", value: "Unavailable", source: "Cycle model not implemented" }),
-      ui.statCard({ label: "Peak Probability", value: "Unavailable", source: "Cycle model not implemented" }),
-      ui.statCard({ label: "Bottom Probability", value: "Unavailable", source: "Cycle model not implemented" }),
-      ui.statCard({ label: "Valuation Bands", value: "Unavailable", source: "Cycle model not implemented" }),
-    ].join("");
+    document.getElementById("cycle-grid").innerHTML = ui.intelligencePanel({
+      title: "Cycle Intelligence",
+      headline: "Unavailable",
+      chartLabel: "Cycle intelligence interactive chart container",
+      insight: "Cycle models are intentionally not implemented in this refinement pass.",
+      statusId: "cycle-panel-status",
+    });
 
     document.getElementById("summary-panel").innerHTML =
-      '<p>AI executive analysis is intentionally disabled until the verified intelligence engine is implemented.</p>';
+      '<p>Market intelligence summary containers are ready for objective market conditions. No financial advice, predictions, or opinions are generated in this milestone.</p>';
+    document.getElementById("feed-category-grid").innerHTML = [
+      "Market",
+      "Network",
+      "Development",
+      "Macro",
+      "Liquidity",
+      "Wallets",
+      "Research",
+    ].map((label) => ui.feedCategory({ label })).join("");
     document.getElementById("alerts-grid").innerHTML = ui.loadingSkeleton("Loading latest verified alerts.");
   }
 
-  function renderGlobalMarkets(markets) {
+  function renderMarketSnapshot(markets) {
     const marketById = new Map(markets.map((market) => [market.id, market]));
-    const cryptoRows = cryptoAssets.map((asset) => {
+    const rows = marketSnapshotRows.map((asset) => {
       const market = marketById.get(asset.id);
       const change = market?.price_change_percentage_24h;
       return ui.marketRow({
         label: asset.label,
-        value: formatPrice(market?.current_price),
+        value: asset.id ? formatPrice(market?.current_price) : "Unavailable",
         change: formatPercent(change),
         changeClass: changeClass(change),
       });
     });
-    const unavailableRows = ["Gold", "Silver", "Oil", "Nasdaq", "S&P 500"].map((label) =>
-      ui.marketRow({ label, value: "Unavailable", change: "--" })
-    );
-    document.getElementById("global-markets").innerHTML = cryptoRows.concat(unavailableRows).join("");
+    document.getElementById("market-snapshot").innerHTML = rows.join("");
   }
 
   function updateSnapshot({ markets, global }) {
@@ -213,18 +260,20 @@
     setText("chartPrice", price);
     setText("chartChange", formatPercent(change));
     if (field("chartChange")) field("chartChange").className = `stat-value ${changeClass(change)}`;
-    setText("marketPrice", price);
-    setText("marketCap", formatCompact(kaspa?.market_cap));
-    setText("marketVolume", formatCompact(kaspa?.total_volume));
-    setText("kaspaDominance", typeof kaspaDominance === "number" ? `${kaspaDominance.toFixed(4)}%` : "Unavailable");
-    setText("circulatingSupply", formatCompact(kaspa?.circulating_supply, " KAS"));
+    const marketHeadline = document.querySelector("#market-grid .panel-headline .stat-value");
+    const supplyHeadline = document.querySelector("#supply-grid .panel-headline .stat-value");
+    if (marketHeadline) marketHeadline.textContent = price;
+    if (supplyHeadline) supplyHeadline.textContent = formatCompact(kaspa?.circulating_supply, " KAS");
 
-    renderGlobalMarkets(markets);
+    renderMarketSnapshot(markets);
     setStatus("ribbon-status", "live", "Live market data");
-    setStatus("global-markets-status", "live", "Live via CoinGecko");
+    setStatus("market-snapshot-status", "live", "Live BTC/ETH data");
     setStatus("market-intelligence-status", "live", "Live via CoinGecko");
     setStatus("supply-intelligence-status", "live", "Partial live data");
     setStatus("network-intelligence-status", "live", "Foundation live");
+    setStatus("market-panel-status", "live", typeof kaspaDominance === "number" ? `${kaspaDominance.toFixed(4)}% dominance` : "Live KAS price");
+    setStatus("supply-panel-status", "live", "Circulating supply live");
+    setStatus("network-panel-status", "unavailable", "Verified provider pending");
   }
 
   function renderChart(points) {
@@ -254,7 +303,7 @@
       updateSnapshot(await dataService.getDashboardSnapshot());
     } catch (error) {
       setStatus("ribbon-status", "error", "Market data unavailable");
-      setStatus("global-markets-status", "error", "Markets unavailable");
+      setStatus("market-snapshot-status", "error", "Snapshot unavailable");
       setStatus("market-intelligence-status", "error", "Market data unavailable");
       setStatus("supply-intelligence-status", "unavailable", "Partial data");
       setStatus("network-intelligence-status", "unavailable", "Partial data");
@@ -277,17 +326,12 @@
     const grid = document.getElementById("alerts-grid");
     if (!grid) return;
     try {
-      const alerts = await dataService.getAlerts();
-      if (!Array.isArray(alerts) || alerts.length === 0) {
-        grid.innerHTML = ui.loadingSkeleton("No verified alerts are available.");
-        setStatus("latest-alerts-status", "unavailable", "No alerts");
-        return;
-      }
-      grid.innerHTML = alerts.slice(0, 3).map(ui.alertCard).join("");
-      setStatus("latest-alerts-status", "live", "Local verified feed");
+      await dataService.getAlerts();
+      grid.innerHTML = ui.loadingSkeleton("Verified market intelligence feed pending.");
+      setStatus("market-intelligence-feed-status", "unavailable", "Categories ready");
     } catch (error) {
       grid.innerHTML = ui.loadingSkeleton("Alert feed unavailable.");
-      setStatus("latest-alerts-status", "error", "Feed unavailable");
+      setStatus("market-intelligence-feed-status", "error", "Feed unavailable");
     }
   }
 
@@ -307,6 +351,7 @@
 
   async function initializeDashboard() {
     renderSectionHeaders();
+    renderChartToolbar();
     renderInitialState();
     bindControls();
     await Promise.allSettled([loadSnapshot(), loadChart(), loadAlerts()]);

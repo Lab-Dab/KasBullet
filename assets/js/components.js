@@ -42,6 +42,46 @@
     `;
   }
 
+  function toolbarButton({ label, active = false, disabled = false }) {
+    return `
+      <button type="button" class="toolbar-button" aria-pressed="${active ? "true" : "false"}"${disabled ? " disabled" : ""}>
+        ${escapeHtml(label)}
+      </button>
+    `;
+  }
+
+  function intelligencePanel({ title, headline, chartLabel, insight, statusId }) {
+    return `
+      <article class="intelligence-panel">
+        <div class="intelligence-panel-header">
+          <h3>${escapeHtml(title)}</h3>
+          <span class="module-status" id="${escapeHtml(statusId)}" data-status="unavailable">Container ready</span>
+        </div>
+        <div class="panel-headline">
+          <span class="stat-label">Headline Metric</span>
+          <strong class="stat-value">${escapeHtml(headline)}</strong>
+        </div>
+        <div class="panel-chart" role="img" aria-label="${escapeHtml(chartLabel)}">
+          <span>Interactive Chart Container</span>
+        </div>
+        <div class="panel-insight">
+          <span class="stat-label">Key Insight</span>
+          <p>${escapeHtml(insight)}</p>
+        </div>
+        <button type="button" class="expand-button" aria-label="Expand ${escapeHtml(title)}">Expand</button>
+      </article>
+    `;
+  }
+
+  function feedCategory({ label }) {
+    return `
+      <article class="feed-category">
+        <h3>${escapeHtml(label)}</h3>
+        <p>Verified ${escapeHtml(label.toLowerCase())} intelligence container.</p>
+      </article>
+    `;
+  }
+
   function marketRow({ label, value, change, changeClass = "change neutral" }) {
     return `
       <div class="market-row">
@@ -76,6 +116,9 @@
     renderSectionHeader,
     metricCard,
     statCard,
+    toolbarButton,
+    intelligencePanel,
+    feedCategory,
     marketRow,
     alertCard,
     loadingSkeleton,

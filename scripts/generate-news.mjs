@@ -1,7 +1,7 @@
 // generate-news.mjs
 //
 // Run by .github/workflows/update-news.yml on a schedule.
-// 1. Resolves the KaspaWojak channel's uploads playlist.
+// 1. Resolves the configured verified source channel's uploads playlist.
 // 2. Finds videos not already in data/news.json.
 // 3. Pulls each video's transcript.
 // 4. Asks Claude to turn the transcript into a short news-style story.
@@ -9,7 +9,7 @@
 //
 // Required environment variables:
 //   YOUTUBE_API_KEY        - a YouTube Data API v3 key (console.cloud.google.com)
-//   YOUTUBE_CHANNEL_HANDLE - channel handle without the @, e.g. "KaspaWojak"
+//   YOUTUBE_CHANNEL_HANDLE - verified source channel handle without the @
 //   ANTHROPIC_API_KEY      - your Anthropic API key (console.anthropic.com)
 
 import { YoutubeTranscript } from 'youtube-transcript';
@@ -18,13 +18,17 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const CHANNEL_HANDLE = (process.env.YOUTUBE_CHANNEL_HANDLE || 'KaspaWojak').replace(/^@/, '');
+const CHANNEL_HANDLE = (process.env.YOUTUBE_CHANNEL_HANDLE || '').replace(/^@/, '');
 const NEWS_PATH = path.join(process.cwd(), '..', 'data', 'news.json');
 const MAX_NEW_VIDEOS_PER_RUN = 5; // safety cap so one run can't burn your whole API quota/budget
 const MAX_FEED_LENGTH = 60;       // how many stories to keep in the feed
 
 if (!YOUTUBE_API_KEY) {
   console.error('Missing YOUTUBE_API_KEY');
+  process.exit(1);
+}
+if (!CHANNEL_HANDLE) {
+  console.error('Missing YOUTUBE_CHANNEL_HANDLE');
   process.exit(1);
 }
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -76,15 +80,15 @@ async function writeStory({ title, description, transcript }) {
     ? `Transcript:\n${transcript.slice(0, 12000)}`
     : `No transcript was available. Use only this video description:\n${description || '(no description)'}`;
 
-  const prompt = `You are the news editor for KasBullet, an institutional macro intelligence platform focused on Kaspa (KAS). \
-A new video was posted on the KaspaWojak YouTube channel titled "${title}".
+  const prompt = `You are the market intelligence editor for KasBullet, an institutional data platform focused on Kaspa (KAS). \
+A new item was posted by a configured verified source titled "${title}".
 
 ${source}
 
-Write a short news-style update (120-180 words) summarizing what this video covers, for readers who want the \
+Write a short factual update (120-180 words) summarizing what this item covers, for readers who want the \
 substance without watching the full video. Neutral, factual tone; no hype, no price predictions, no financial \
-advice. Do not invent facts that aren't in the source material above; if the source is thin, keep the story short \
-and general rather than filling in unsupported details.
+advice, no creator promotion, and no opinions. Do not invent facts that aren't in the source material above; \
+if the source is thin, keep the story short and general rather than filling in unsupported details.
 
 Respond with ONLY valid JSON, no markdown fences, in this exact shape:
 {"headline": "a punchy 6-12 word headline", "story": "the 120-180 word story", "tags": ["tag1", "tag2", "tag3"]}`;

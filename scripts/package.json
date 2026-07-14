@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Pulls new KaspaWojak uploads, summarizes them with Claude, updates data/news.json",
+  "description": "Pulls verified source updates, summarizes them with Claude, updates data/news.json",
   "scripts": {
     "generate": "node generate-news.mjs"
   },

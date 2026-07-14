@@ -2,7 +2,7 @@
 
 KasBullet is a static institutional intelligence terminal for Kaspa. The
 homepage foundation is organized around permanent containers for market, supply,
-network, cycle, AI summary and alert intelligence, backed by shared browser-side
+network, cycle, summary and feed intelligence, backed by shared browser-side
 data services.
 
 ## Run Locally
@@ -30,17 +30,17 @@ M2, exchange balances, cycle scores, AI summaries, metals, commodities, and
 equity indexes need verified providers or models before they should render live
 numbers.
 
-## News Automation
+## Feed Automation
 
 The optional GitHub Action in `.github/workflows/update-news.yml` updates
-`data/news.json` from the KaspaWojak YouTube channel.
+`data/news.json` from a configured verified source channel.
 
 Required secrets:
 
 - `YOUTUBE_API_KEY`
 - `ANTHROPIC_API_KEY`
 
-Optional variable:
+Required variable:
 
 - `YOUTUBE_CHANNEL_HANDLE`
 

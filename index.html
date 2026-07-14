@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KasBullet | Institutional Intelligence for Kaspa</title>
-  <meta name="description" content="KasBullet is an institutional intelligence terminal for Kaspa, built around objective market, supply, network, cycle and alert data.">
+  <meta name="description" content="KasBullet is an institutional intelligence terminal for Kaspa, built around objective market, supply, network, cycle, summary and feed containers.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         <a href="#supply-intelligence">Supply</a>
         <a href="#network-intelligence">Network</a>
         <a href="#cycle-intelligence">Cycle</a>
-        <a href="#latest-alerts">Alerts</a>
+        <a href="#market-intelligence-feed">Feed</a>
       </nav>
     </div>
   </header>
@@ -40,26 +40,26 @@
       <div class="ribbon-grid" id="ribbon-grid" aria-live="polite"></div>
     </section>
 
-    <section class="dashboard-grid primary-workspace" id="primary-chart" aria-labelledby="primary-chart-title">
-      <aside class="module" aria-labelledby="global-markets-title">
-        <div id="global-markets-header"></div>
-        <div class="market-list" id="global-markets" aria-live="polite"></div>
+    <section class="dashboard-grid primary-workspace" id="main-dashboard" aria-label="Main dashboard">
+      <aside class="module" aria-labelledby="market-snapshot-title">
+        <div id="market-snapshot-header"></div>
+        <div class="market-list" id="market-snapshot" aria-live="polite"></div>
       </aside>
 
       <article class="module module-large chart-panel" aria-labelledby="primary-chart-title">
         <div id="primary-chart-header"></div>
-        <div class="chart-toolbar" role="group" aria-label="KAS chart timeframe">
-          <button type="button" class="timeframe" data-timeframe="7" aria-pressed="false">1W</button>
-          <button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>
-          <button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>
-          <button type="button" class="timeframe" data-timeframe="365" aria-pressed="false">1Y</button>
-        </div>
+        <div class="chart-toolbar" id="chart-toolbar" aria-label="Kaspa market terminal toolbar"></div>
         <div class="chart-stats" id="chart-stats" aria-live="polite"></div>
         <div class="chart-shell">
           <canvas id="kasChart" aria-label="KAS price chart"></canvas>
           <div class="chart-fallback" id="chart-fallback" hidden></div>
         </div>
       </article>
+
+      <section class="module cycle-strip" id="cycle-strip" aria-labelledby="cycle-strip-title">
+        <div id="cycle-strip-header"></div>
+        <div class="cycle-strip-grid" id="cycle-strip-grid" aria-live="polite"></div>
+      </section>
     </section>
 
     <section class="module" id="market-intelligence" aria-labelledby="market-intelligence-title">
@@ -82,13 +82,14 @@
       <div class="stat-grid" id="cycle-grid" aria-live="polite"></div>
     </section>
 
-    <section class="module executive-summary" id="ai-executive-summary" aria-labelledby="ai-executive-summary-title">
-      <div id="ai-executive-summary-header"></div>
+    <section class="module executive-summary" id="market-intelligence-summary" aria-labelledby="market-intelligence-summary-title">
+      <div id="market-intelligence-summary-header"></div>
       <div class="summary-panel" id="summary-panel" aria-live="polite"></div>
     </section>
 
-    <section class="module" id="latest-alerts" aria-labelledby="latest-alerts-title">
-      <div id="latest-alerts-header"></div>
+    <section class="module" id="market-intelligence-feed" aria-labelledby="market-intelligence-feed-title">
+      <div id="market-intelligence-feed-header"></div>
+      <div class="feed-category-grid" id="feed-category-grid"></div>
       <div class="alerts-grid" id="alerts-grid" aria-live="polite"></div>
     </section>
   </main>
