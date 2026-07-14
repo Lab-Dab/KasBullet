@@ -1,86 +1,57 @@
-# KasBullet — deployment guide
+# KasBullet
 
-This repo is ready to push and deploy as-is. Everything below is copy-paste;
-the only things you need to supply are your own accounts/keys, called out
-explicitly at each step.
+KasBullet is a static institutional intelligence terminal for Kaspa. The
+homepage foundation is organized around permanent containers for market, supply,
+network, cycle, AI summary and alert intelligence, backed by shared browser-side
+data services.
 
-## 1. Push this to GitHub
+## Run Locally
+
+Serve the repository root with any static server:
 
 ```bash
-cd kasbullet-repo
-git init
-git add .
-git commit -m "Initial KasBullet site"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/kasbullet.git
-git push -u origin main
+python -m http.server 8000
 ```
 
-You'll need to create the empty repo on GitHub first (github.com → New
-repository → don't initialize with a README, since this folder already has
-one) and be logged in to `git push` (GitHub will prompt for auth, or use the
-`gh` CLI / a personal access token if you have one set up).
+Then open `http://localhost:8000`.
 
-## 2. Deploy it — pick one
+Opening `index.html` directly may block `fetch("data/news.json")` in some
+browsers, so a local server is recommended.
 
-**Netlify** (recommended if you want a dashboard + easy custom domain later)
-1. netlify.com → sign up / log in → "Add new site" → "Import an existing
-   project" → connect GitHub → pick this repo.
-2. Build settings: leave "Build command" blank, set "Publish directory" to
-   `.` (repo root). It's a static site — nothing to build.
-3. Deploy. You'll get a `random-name-123.netlify.app` URL immediately, and
-   every future `git push` redeploys automatically — including when the news
-   automation commits an update.
+## Data Sources
 
-**Cloudflare Pages** (same idea, Cloudflare's network)
-1. dash.cloudflare.com → Workers & Pages → Create → Pages → Connect to Git →
-   pick this repo.
-2. Framework preset: "None". Build command: blank. Output directory: `/`.
-3. Deploy. You get a `project-name.pages.dev` URL, same auto-redeploy-on-push
-   behavior.
+- CoinGecko public API: KAS, BTC and ETH prices, market caps, dominance context,
+  circulating supply, and KAS price history.
+- `data/news.json`: local generated alert feed.
+- `kas.fyi`: linked for live Kaspa explorer detail.
 
-**GitHub Pages** (if you'd rather not add a third-party host)
-1. Repo → Settings → Pages → Source: "Deploy from a branch" → `main` → `/root`.
-2. Your site is at `https://YOUR-USERNAME.github.io/kasbullet/`.
+Unavailable panels display `Unavailable` instead of fabricated values. Global
+M2, exchange balances, cycle scores, AI summaries, metals, commodities, and
+equity indexes need verified providers or models before they should render live
+numbers.
 
-## 3. Turn on the news automation
+## News Automation
 
-See `NEWS-AUTOMATION.md` for the full walkthrough. Short version:
-- Get a YouTube Data API key (console.cloud.google.com) and an Anthropic API
-  key (console.anthropic.com).
-- Add both as **repo secrets**: Settings → Secrets and variables → Actions →
-  New repository secret → `YOUTUBE_API_KEY` and `ANTHROPIC_API_KEY`.
-- Go to the **Actions** tab → "Update Kaspa News Feed" → "Run workflow" to
-  populate `data/news.json` for the first time.
-- After that it runs itself every 6 hours.
+The optional GitHub Action in `.github/workflows/update-news.yml` updates
+`data/news.json` from the KaspaWojak YouTube channel.
 
-## 4. Set your Buttondown username
+Required secrets:
 
-Open `index.html`, find this line in the Subscribe section:
+- `YOUTUBE_API_KEY`
+- `ANTHROPIC_API_KEY`
 
-```html
-action="https://buttondown.com/api/emails/embed-subscribe/YOUR-BUTTONDOWN-USERNAME"
-```
+Optional variable:
 
-Replace `YOUR-BUTTONDOWN-USERNAME` with your real one, commit, push.
+- `YOUTUBE_CHANNEL_HANDLE`
 
-## 5. Custom domain (optional)
+See `NEWS-AUTOMATION.md` for details.
 
-Buy a domain anywhere (Namecheap, Cloudflare Registrar, Google Domains,
-etc.), then in your host's dashboard (Netlify: Site settings → Domain
-management; Cloudflare Pages: your project → Custom domains) add it and
-follow the DNS instructions shown there — usually one CNAME record.
+## Deployment
 
-## What's already real-time and needs nothing further
+Deploy the repository root to any static host:
 
-- **TradingView charts** stream live tick data once the page is served from a
-  real domain — no setup needed beyond deploying.
-- **KAS price ticker** polls CoinGecko's public API every 20 seconds — free,
-  no key required.
+- Netlify: no build command, publish directory `.`
+- Cloudflare Pages: framework preset `None`, output directory `/`
+- GitHub Pages: deploy from the root of `main`
 
-## What to check once it's live (not just opened as a local file)
-
-- The subscribe form (hidden-iframe submission behaves differently from
-  `file://`)
-- The news section (relative fetch to `data/news.json` needs a real server)
-- Mobile layout
+No build step is required.

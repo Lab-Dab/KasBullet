@@ -76,13 +76,13 @@ async function writeStory({ title, description, transcript }) {
     ? `Transcript:\n${transcript.slice(0, 12000)}`
     : `No transcript was available. Use only this video description:\n${description || '(no description)'}`;
 
-  const prompt = `You are the news editor for KasBullet, a Kaspa (KAS) cryptocurrency dashboard. \
+  const prompt = `You are the news editor for KasBullet, an institutional macro intelligence platform focused on Kaspa (KAS). \
 A new video was posted on the KaspaWojak YouTube channel titled "${title}".
 
 ${source}
 
 Write a short news-style update (120-180 words) summarizing what this video covers, for readers who want the \
-substance without watching the full video. Neutral, factual tone — no hype, no price predictions, no financial \
+substance without watching the full video. Neutral, factual tone; no hype, no price predictions, no financial \
 advice. Do not invent facts that aren't in the source material above; if the source is thin, keep the story short \
 and general rather than filling in unsupported details.
 

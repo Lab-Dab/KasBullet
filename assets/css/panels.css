@@ -9,9 +9,7 @@
 
 
 /* ==========================================================
-   Market Intelligence Ribbon
-   Homepage priority 1. Five equal metric modules, each with a
-   title, primary value, trend and a short contextual status.
+   Live Intelligence Ribbon
 ========================================================== */
 
 .ribbon-grid{
@@ -24,7 +22,7 @@
 
 }
 
-.intel-metric{
+.metric-card{
 
     display:flex;
 
@@ -32,9 +30,11 @@
 
     gap:var(--space-2);
 
+    min-width:0;
+
 }
 
-.intel-metric-title{
+.metric-title{
 
     font-size:var(--font-xs);
 
@@ -48,7 +48,7 @@
 
 }
 
-.intel-metric-value{
+.metric-value{
 
     font-size:var(--font-xl);
 
@@ -62,7 +62,7 @@
 
 }
 
-.intel-metric-status{
+.metric-note{
 
     font-size:var(--font-xs);
 
@@ -72,48 +72,20 @@
 
 
 /* ==========================================================
-   Compare toolbar
-   Homepage priority 2. A fixed KAS base compared against a
-   selectable benchmark, plus the timeframe selector.
+   Primary chart toolbar
 ========================================================== */
 
-.compare-toolbar{
+.chart-toolbar{
 
     display:flex;
 
     align-items:center;
 
-    justify-content:space-between;
-
-    flex-wrap:wrap;
-
-    gap:var(--space-5);
-
-}
-
-.compare-pairing{
-
-    display:flex;
-
-    align-items:center;
+    justify-content:flex-end;
 
     flex-wrap:wrap;
 
     gap:var(--space-3);
-
-}
-
-.compare-vs{
-
-    font-size:var(--font-sm);
-
-    font-weight:600;
-
-    letter-spacing:.08em;
-
-    text-transform:uppercase;
-
-    color:var(--text-muted);
 
 }
 
@@ -180,4 +152,132 @@
 
     font-variant-numeric:tabular-nums;
 
+}
+
+
+/* ==========================================================
+   Main chart panel
+========================================================== */
+
+.chart-panel{
+    gap:var(--space-5);
+}
+
+.chart-stats{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:var(--space-4);
+}
+
+.chart-stats > div,
+.stat-card{
+    display:flex;
+    flex-direction:column;
+    gap:var(--space-2);
+    padding:var(--space-4);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-medium);
+    background:rgba(11, 15, 20, .42);
+}
+
+.stat-label{
+    font-size:var(--font-xs);
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+}
+
+.stat-value{
+    font-size:var(--font-lg);
+    font-weight:800;
+    color:var(--text-primary);
+    font-variant-numeric:tabular-nums;
+}
+
+.stat-src{
+    font-size:var(--font-xs);
+    color:var(--text-secondary);
+}
+
+.chart-shell{
+    position:relative;
+    flex:1;
+    min-height:360px;
+}
+
+.chart-shell canvas{
+    width:100% !important;
+    height:100% !important;
+}
+
+.chart-fallback{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    padding:var(--space-5);
+    text-align:center;
+    color:var(--text-secondary);
+    border:1px dashed var(--border-color);
+    border-radius:var(--radius-medium);
+}
+
+
+/* ==========================================================
+   Intelligence panels
+========================================================== */
+
+.stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+    gap:var(--space-4);
+}
+
+.alerts-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:var(--space-5);
+}
+
+.alert-card{
+    display:flex;
+    flex-direction:column;
+    gap:var(--space-3);
+    min-height:100%;
+    padding:var(--space-5);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-medium);
+    background:rgba(11, 15, 20, .42);
+}
+
+.alert-card time{
+    font-size:var(--font-xs);
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+}
+
+.alert-card h3{
+    font-size:var(--font-md);
+    color:var(--text-primary);
+}
+
+.alert-card p{
+    font-size:var(--font-sm);
+}
+
+.alert-card a{
+    margin-top:auto;
+    color:var(--color-primary);
+    font-size:var(--font-sm);
+    font-weight:700;
+}
+
+.summary-panel{
+    padding:var(--space-5);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-medium);
+    background:rgba(11, 15, 20, .42);
 }

@@ -22,6 +22,44 @@
 
     }
 
+    .module{
+
+        padding:var(--space-5);
+
+    }
+
+    .module-header{
+
+        align-items:flex-start;
+
+        flex-direction:column;
+
+    }
+
+    .chart-toolbar{
+
+        width:100%;
+
+    }
+
+    .timeframe{
+
+        flex:1;
+
+    }
+
+    .chart-stats{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .chart-shell{
+
+        min-height:300px;
+
+    }
+
 }
 
 

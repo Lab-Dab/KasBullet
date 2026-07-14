@@ -1,128 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KasBullet | Macro Intelligence for Kaspa</title>
-<meta name="description" content="Institutional-grade macro intelligence for Kaspa — market structure, liquidity and on-chain behaviour in one calm view.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/variables.css">
-<link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/layout.css">
-<link rel="stylesheet" href="assets/css/components.css">
-<link rel="stylesheet" href="assets/css/panels.css">
-<link rel="stylesheet" href="assets/css/responsive.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KasBullet | Institutional Intelligence for Kaspa</title>
+  <meta name="description" content="KasBullet is an institutional intelligence terminal for Kaspa, built around objective market, supply, network, cycle and alert data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/panels.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
-<header class="app-header">
-<div class="header-container">
-<a class="brand" href="#"><span class="brand-text">KasBullet</span><img src="assets/kasbullet-logo.png" class="brand-mark" alt="Kaspa Logo"></a>
-<nav class="main-nav" aria-label="Primary">
-<a href="#">Dashboard</a><a href="#">Markets</a><a href="#">Macro</a><a href="#">On-Chain</a><a href="#">Compare</a><a href="#">Research</a><a href="#">About</a>
-</nav>
-</div>
-</header>
-<main class="dashboard">
-<h1 class="visually-hidden">KasBullet — Kaspa macro intelligence dashboard</h1>
+  <header class="app-header">
+    <div class="header-container">
+      <a class="brand" href="#top" aria-label="KasBullet home">
+        <img src="assets/kasbullet-logo.png" class="brand-mark" alt="">
+        <span class="brand-text">KasBullet</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="#market-intelligence">Markets</a>
+        <a href="#supply-intelligence">Supply</a>
+        <a href="#network-intelligence">Network</a>
+        <a href="#cycle-intelligence">Cycle</a>
+        <a href="#latest-alerts">Alerts</a>
+      </nav>
+    </div>
+  </header>
 
-<!-- Market Intelligence Ribbon -->
-<!-- Placeholder values only. Each module is keyed with data-metric
-     so a data provider can replace value / trend / status later. -->
-<section class="module intelligence-strip" aria-labelledby="ribbon-title">
-<div class="module-header">
-<h2 id="ribbon-title">Market Intelligence</h2>
-<span class="module-status" data-status="unavailable">Placeholder data</span>
-</div>
-<div class="ribbon-grid">
-<article class="intel-metric" data-metric="btc-dominance">
-<h3 class="intel-metric-title">BTC Dominance</h3>
-<strong class="intel-metric-value">63.2%</strong>
-<span class="change up">+0.4%</span>
-<span class="intel-metric-status">Bitcoin Leading</span>
-</article>
-<article class="intel-metric" data-metric="kaspa-dominance">
-<h3 class="intel-metric-title">Kaspa Dominance</h3>
-<strong class="intel-metric-value">0.18%</strong>
-<span class="change up">+0.02%</span>
-<span class="intel-metric-status">Gaining Share</span>
-</article>
-<article class="intel-metric" data-metric="kaspa-sentiment">
-<h3 class="intel-metric-title">Kaspa Market Sentiment</h3>
-<strong class="intel-metric-value">Neutral</strong>
-<span class="change neutral">Steady</span>
-<span class="intel-metric-status">Balanced Flow</span>
-</article>
-<article class="intel-metric" data-metric="global-m2">
-<h3 class="intel-metric-title">Global M2 Supply</h3>
-<strong class="intel-metric-value">$108.4T</strong>
-<span class="change up">+0.3%</span>
-<span class="intel-metric-status">Liquidity Rising</span>
-</article>
-<article class="intel-metric" data-metric="kaspa-exchange-balances">
-<h3 class="intel-metric-title">Kaspa Exchange Balances</h3>
-<strong class="intel-metric-value">1.42B KAS</strong>
-<span class="change down">-0.8%</span>
-<span class="intel-metric-status">Accumulation</span>
-</article>
-</div>
-</section>
+  <main class="dashboard" id="top">
+    <h1 class="visually-hidden">KasBullet institutional intelligence terminal for Kaspa</h1>
 
-<!-- Compare toolbar -->
-<section class="module compare-bar" id="compare" aria-labelledby="compare-title">
-<div class="module-header">
-<h2 id="compare-title">Compare</h2>
-</div>
-<div class="compare-toolbar">
-<div class="compare-pairing">
-<span class="asset-chip">KAS</span>
-<span class="compare-vs">vs</span>
-<label class="visually-hidden" for="compare-asset">Benchmark asset</label>
-<select class="control-select" id="compare-asset" name="compare-asset">
-<option value="btc">Bitcoin</option>
-<option value="eth">Ethereum</option>
-<option value="gold">Gold</option>
-<option value="silver">Silver</option>
-<option value="oil">Oil</option>
-<option value="spx">S&amp;P 500</option>
-<option value="dxy">DXY</option>
-</select>
-</div>
-<div class="timeframes" role="group" aria-label="Chart timeframe">
-<button type="button" class="timeframe" aria-pressed="false">1W</button>
-<button type="button" class="timeframe" aria-pressed="true">1M</button>
-<button type="button" class="timeframe" aria-pressed="false">3M</button>
-<button type="button" class="timeframe" aria-pressed="false">1Y</button>
-<button type="button" class="timeframe" aria-pressed="false">ALL</button>
-</div>
-</div>
-</section>
+    <section class="module intelligence-strip" id="live-intelligence-ribbon" aria-labelledby="ribbon-title">
+      <div id="ribbon-header"></div>
+      <div class="ribbon-grid" id="ribbon-grid" aria-live="polite"></div>
+    </section>
 
-<!-- Existing dashboard modules — preserved unchanged -->
-<section class="dashboard-grid">
-<article class="module">
-<div class="module-header"><h2>Global Markets</h2><span class="module-status">Updated: --</span></div>
-<div class="market-list">
-<div class="market-row"><span>KAS</span><span>$0.0000</span><span>--%</span></div>
-<div class="market-row"><span>BTC</span><span>$0</span><span>--%</span></div>
-<div class="market-row"><span>ETH</span><span>$0</span><span>--%</span></div>
-<div class="market-row"><span>Gold</span><span>$0</span><span>--%</span></div>
-<div class="market-row"><span>Silver</span><span>$0</span><span>--%</span></div>
-<div class="market-row"><span>Oil</span><span>$0</span><span>--%</span></div>
-<div class="market-row"><span>S&amp;P 500</span><span>0</span><span>--%</span></div>
-<div class="market-row"><span>DXY</span><span>0</span><span>--%</span></div>
-</div>
-</article>
-<article class="module module-large">
-<div class="module-header"><h2>KAS vs BTC</h2><span class="module-status">Normalized Performance</span></div>
-<canvas id="comparisonChart"></canvas>
-</article>
-<article class="module"><div class="module-header"><h2>Macro</h2><span class="module-status">Updated: --</span></div></article>
-<article class="module"><div class="module-header"><h2>On-Chain</h2><span class="module-status">Updated: --</span></div></article>
-</section>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="assets/js/app.js"></script>
+    <section class="dashboard-grid primary-workspace" id="primary-chart" aria-labelledby="primary-chart-title">
+      <aside class="module" aria-labelledby="global-markets-title">
+        <div id="global-markets-header"></div>
+        <div class="market-list" id="global-markets" aria-live="polite"></div>
+      </aside>
+
+      <article class="module module-large chart-panel" aria-labelledby="primary-chart-title">
+        <div id="primary-chart-header"></div>
+        <div class="chart-toolbar" role="group" aria-label="KAS chart timeframe">
+          <button type="button" class="timeframe" data-timeframe="7" aria-pressed="false">1W</button>
+          <button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>
+          <button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>
+          <button type="button" class="timeframe" data-timeframe="365" aria-pressed="false">1Y</button>
+        </div>
+        <div class="chart-stats" id="chart-stats" aria-live="polite"></div>
+        <div class="chart-shell">
+          <canvas id="kasChart" aria-label="KAS price chart"></canvas>
+          <div class="chart-fallback" id="chart-fallback" hidden></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="module" id="market-intelligence" aria-labelledby="market-intelligence-title">
+      <div id="market-intelligence-header"></div>
+      <div class="stat-grid" id="market-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="module" id="supply-intelligence" aria-labelledby="supply-intelligence-title">
+      <div id="supply-intelligence-header"></div>
+      <div class="stat-grid" id="supply-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="module" id="network-intelligence" aria-labelledby="network-intelligence-title">
+      <div id="network-intelligence-header"></div>
+      <div class="stat-grid" id="network-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="module" id="cycle-intelligence" aria-labelledby="cycle-intelligence-title">
+      <div id="cycle-intelligence-header"></div>
+      <div class="stat-grid" id="cycle-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="module executive-summary" id="ai-executive-summary" aria-labelledby="ai-executive-summary-title">
+      <div id="ai-executive-summary-header"></div>
+      <div class="summary-panel" id="summary-panel" aria-live="polite"></div>
+    </section>
+
+    <section class="module" id="latest-alerts" aria-labelledby="latest-alerts-title">
+      <div id="latest-alerts-header"></div>
+      <div class="alerts-grid" id="alerts-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>KasBullet aggregates objective public market and network context for research. Not financial advice.</p>
+    <p>Data sources: CoinGecko public API, local alert feed, kas.fyi links.</p>
+  </footer>
+
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/comparison.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>

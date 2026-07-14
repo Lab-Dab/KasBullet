@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "videoId": "epXAk4p_Bp8",
+    "headline": "KaspaWojak Compares Kaspa With Ethereum's 2019 Setup",
+    "story": "A KaspaWojak upload argues that Kaspa is showing a market pattern the creator compares with Ethereum's 2019 structure. The available video metadata does not include a transcript or detailed supporting data, so the specific chart evidence cannot be independently summarized from the feed. KasBullet is treating the item as commentary rather than confirmed market research.",
+    "tags": ["Kaspa", "Ethereum", "Market Commentary"],
+    "thumbnail": "https://i.ytimg.com/vi/epXAk4p_Bp8/hqdefault.jpg",
+    "publishedAt": "2026-07-04T11:00:06Z",
+    "videoUrl": "https://www.youtube.com/watch?v=epXAk4p_Bp8",
+    "channelUrl": "https://www.youtube.com/@KaspaWojak",
+    "generatedAt": "2026-07-06T13:43:13.350Z",
+    "transcriptAvailable": false
+  },
+  {
+    "videoId": "RBIL9w62aAk",
+    "headline": "KaspaWojak Flags Bitcoin 2015 Pattern Comparison",
+    "story": "A recent KaspaWojak video claims Kaspa's current market behavior resembles Bitcoin's 2015 price action. No transcript or detailed chart breakdown was available in the feed, so the claim remains a creator thesis rather than a verified KasBullet data point. Readers should treat it as market commentary and consult the original video for the full argument.",
+    "tags": ["Kaspa", "Bitcoin", "Market Commentary"],
+    "thumbnail": "https://i.ytimg.com/vi/RBIL9w62aAk/hqdefault.jpg",
+    "publishedAt": "2026-06-30T11:45:25Z",
+    "videoUrl": "https://www.youtube.com/watch?v=RBIL9w62aAk",
+    "channelUrl": "https://www.youtube.com/@KaspaWojak",
+    "generatedAt": "2026-07-06T13:43:19.282Z",
+    "transcriptAvailable": false
+  },
+  {
+    "videoId": "4eCEj9j1nnU",
+    "headline": "KaspaWojak Discusses Post-Toccata Fee Rate Increase",
+    "story": "A KaspaWojak upload focuses on a reported increase in Kaspa fee rates after the Toccata upgrade. The feed does not include a transcript, methodology, or direct network measurements, so KasBullet cannot verify the magnitude or cause from this item alone. The subject is relevant for network-health monitoring and should be cross-checked against explorer data.",
+    "tags": ["Kaspa", "Toccata", "Network Fees"],
+    "thumbnail": "https://i.ytimg.com/vi/4eCEj9j1nnU/hqdefault.jpg",
+    "publishedAt": "2026-06-29T11:00:13Z",
+    "videoUrl": "https://www.youtube.com/watch?v=4eCEj9j1nnU",
+    "channelUrl": "https://www.youtube.com/@KaspaWojak",
+    "generatedAt": "2026-07-06T13:43:28.023Z",
+    "transcriptAvailable": false
+  }
+]
