@@ -1,14 +1,23 @@
 (function () {
   "use strict";
 
-  const { dataService, refreshManager, eventBus } = window.KasBulletCore;
+  const {
+    dataService,
+    refreshManager,
+    eventBus,
+    stateStore,
+    historicalDataService,
+    kaspaNetworkService,
+    backgroundPrefetchManager,
+  } = window.KasBulletCore;
   const ui = window.KasBulletComponents;
   let latestChartPoints = [];
 
   const marketSnapshotRows = [
     { label: "BTC", id: "bitcoin" },
     { label: "ETH", id: "ethereum" },
-    { label: "SOL" },
+    { label: "SOL", id: "solana" },
+    { label: "XRP", id: "ripple" },
     { label: "Gold" },
     { label: "Silver" },
     { label: "Oil" },
@@ -54,6 +63,13 @@
   function formatPercent(value) {
     if (typeof value !== "number") return "Unavailable";
     return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+  }
+
+  function formatLastUpdated(value) {
+    if (!value) return "Last Updated unavailable";
+    const date = new Date(value);
+    if (Number.isNaN(date.valueOf())) return "Last Updated unavailable";
+    return `Last Updated ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
   }
 
   function changeClass(value) {
@@ -245,7 +261,7 @@
     document.getElementById("market-snapshot").innerHTML = rows.join("");
   }
 
-  function updateSnapshot({ markets, global }) {
+  function updateSnapshot({ markets, global }, updatedAt) {
     const kaspa = markets.find((market) => market.id === "kaspa");
     const totalMarketCap = global.data?.total_market_cap?.usd;
     const kaspaDominance =
@@ -266,12 +282,12 @@
     if (supplyHeadline) supplyHeadline.textContent = formatCompact(kaspa?.circulating_supply, " KAS");
 
     renderMarketSnapshot(markets);
-    setStatus("ribbon-status", "live", "Live market data");
-    setStatus("market-snapshot-status", "live", "Live BTC/ETH data");
+    setStatus("ribbon-status", "live", formatLastUpdated(updatedAt));
+    setStatus("market-snapshot-status", "live", formatLastUpdated(updatedAt));
     setStatus("market-intelligence-status", "live", "Live via CoinGecko");
     setStatus("supply-intelligence-status", "live", "Partial live data");
     setStatus("network-intelligence-status", "live", "Foundation live");
-    setStatus("market-panel-status", "live", typeof kaspaDominance === "number" ? `${kaspaDominance.toFixed(4)}% dominance` : "Live KAS price");
+    setStatus("market-panel-status", "live", typeof kaspaDominance === "number" ? `${kaspaDominance.toFixed(4)}% dominance` : formatLastUpdated(updatedAt));
     setStatus("supply-panel-status", "live", "Circulating supply live");
     setStatus("network-panel-status", "unavailable", "Verified provider pending");
   }
@@ -298,9 +314,29 @@
     setStatus("primary-chart-status", "live", "Live via CoinGecko");
   }
 
+  function applyState(state, change) {
+    if (state.market.status === "live" && state.market.data && (!change || change.path === "market")) {
+      updateSnapshot(state.market.data, state.market.updatedAt);
+    }
+
+    if (state.network.status === "live" && (!change || change.path === "network")) {
+      setStatus("network-intelligence-status", "live", formatLastUpdated(state.network.updatedAt));
+      setStatus("network-panel-status", "live", "Kaspa API connected");
+    }
+
+    if (state.network.status === "unavailable" && (!change || change.path === "network")) {
+      setStatus("network-intelligence-status", "unavailable", "Cached or pending network data");
+      setStatus("network-panel-status", "unavailable", "Verified provider pending");
+    }
+
+    if (state.feed.status === "live" && (!change || change.path === "feed")) {
+      setStatus("market-intelligence-feed-status", "live", formatLastUpdated(state.feed.updatedAt));
+    }
+  }
+
   async function loadSnapshot() {
     try {
-      updateSnapshot(await dataService.getDashboardSnapshot());
+      await dataService.getDashboardSnapshot();
     } catch (error) {
       setStatus("ribbon-status", "error", "Market data unavailable");
       setStatus("market-snapshot-status", "error", "Snapshot unavailable");
@@ -315,7 +351,8 @@
     const days = Number(pressed?.dataset.timeframe || 30);
     try {
       setStatus("primary-chart-status", "loading", "Loading chart");
-      renderChart(await dataService.getKaspaHistory(days));
+      const points = await historicalDataService.getHistory("kaspa", days);
+      renderChart(points.map((point) => ({ ...point, price: point.value })));
     } catch (error) {
       setStatus("primary-chart-status", "error", "Chart data unavailable");
       renderChart([]);
@@ -354,8 +391,11 @@
     renderChartToolbar();
     renderInitialState();
     bindControls();
-    await Promise.allSettled([loadSnapshot(), loadChart(), loadAlerts()]);
-    refreshManager.register("dashboard-snapshot", loadSnapshot, 60 * 1000);
+    stateStore.subscribe(applyState);
+    backgroundPrefetchManager.start();
+    await Promise.allSettled([loadSnapshot(), loadChart(), loadAlerts(), kaspaNetworkService.getNetworkSnapshot()]);
+    refreshManager.register("dashboard-price", loadSnapshot, window.KasBulletCore.refreshIntervals.price);
+    refreshManager.register("dashboard-network", () => kaspaNetworkService.getNetworkSnapshot(), window.KasBulletCore.refreshIntervals.network);
     eventBus.publish("dashboard:ready");
   }
 
