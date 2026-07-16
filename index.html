@@ -24,13 +24,27 @@
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="#market-intelligence">Markets</a>
-        <a href="#supply-intelligence">Supply</a>
+        <a href="#compare-workspace">Compare</a>
         <a href="#network-intelligence">Network</a>
-        <a href="#cycle-intelligence">Cycle</a>
-        <a href="#market-intelligence-feed">Feed</a>
+        <a href="#market-intelligence-feed">Intelligence</a>
+        <a href="#research-workspace">Research</a>
+        <a href="#lab-workspace">Lab</a>
+        <a href="#search-workspace">Search</a>
+        <a href="#user-workspace">User</a>
       </nav>
     </div>
   </header>
+
+  <aside class="system-status-bar" id="system-status-bar" aria-label="System status" aria-live="polite">
+    <span class="system-status-item status-healthy" data-field="coreEngineStatus">Core Engine Healthy</span>
+    <span class="system-status-item" data-field="providerHealth">Provider Health: Preparing</span>
+    <span class="system-status-item" data-field="providerCount">Providers: --/--</span>
+    <span class="system-status-item" data-field="latency">Latency: -- ms</span>
+    <span class="system-status-item" data-field="lastSync">Last Sync: -- UTC</span>
+    <span class="system-status-item" data-field="connectionStatus">Connection Status: Preparing</span>
+    <span class="system-status-item" data-field="historicalCache">Historical Cache: Ready</span>
+    <span class="system-status-item" data-field="liveStream">Live Stream: Connected</span>
+  </aside>
 
   <main class="dashboard" id="top">
     <h1 class="visually-hidden">KasBullet institutional intelligence terminal for Kaspa</h1>
@@ -46,9 +60,16 @@
         <div class="market-list" id="market-snapshot" aria-live="polite"></div>
       </aside>
 
+      <section class="module network-status-panel" id="kaspa-network-status" aria-labelledby="kaspa-network-status-title">
+        <div id="kaspa-network-status-header"></div>
+        <div class="network-status-grid" id="kaspa-network-status-grid" aria-live="polite"></div>
+      </section>
+
       <article class="module module-large chart-panel" aria-labelledby="primary-chart-title">
         <div id="primary-chart-header"></div>
         <div class="chart-toolbar" id="chart-toolbar" aria-label="Kaspa market terminal toolbar"></div>
+        <div class="terminal-legend" id="terminal-legend" aria-label="Kaspa market terminal legend"></div>
+        <div class="terminal-overlays" id="terminal-overlays" aria-label="Kaspa market terminal overlays"></div>
         <div class="chart-stats" id="chart-stats" aria-live="polite"></div>
         <div class="chart-shell">
           <canvas id="kasChart" aria-label="KAS price chart"></canvas>
@@ -96,9 +117,30 @@
 
   <footer class="site-footer">
     <p>KasBullet aggregates objective public market and network context for research. Not financial advice.</p>
-    <p>Data sources: CoinGecko public API, local alert feed, kas.fyi links.</p>
+    <p>Powered by the KasBullet Core Intelligence Engine and modular provider architecture.</p>
   </footer>
 
+  <section class="workspace-shell" id="compare-workspace" aria-label="Compare workspace" hidden></section>
+  <section class="workspace-shell" id="research-workspace" aria-label="Research workspace" hidden></section>
+  <section class="workspace-shell" id="lab-workspace" aria-label="Lab workspace" hidden></section>
+  <section class="workspace-shell" id="search-workspace" aria-label="Search workspace" hidden></section>
+  <section class="workspace-shell" id="user-workspace" aria-label="User profile workspace" hidden></section>
+
+  <script src="assets/js/services/CacheManager.js"></script>
+  <script src="assets/js/services/EventBus.js"></script>
+  <script src="assets/js/services/StateStore.js"></script>
+  <script src="assets/js/services/AssetRegistry.js"></script>
+  <script src="assets/js/services/ProviderManager.js"></script>
+  <script src="assets/js/services/TimeSeriesEngine.js"></script>
+  <script src="assets/js/services/AnalyticsEngine.js"></script>
+  <script src="assets/js/services/IntelligenceEngine.js"></script>
+  <script src="assets/js/services/RefreshScheduler.js"></script>
+  <script src="assets/js/services/CompareService.js"></script>
+  <script src="assets/js/services/HistoricalMarketService.js"></script>
+  <script src="assets/js/services/MacroMarketService.js"></script>
+  <script src="assets/js/services/KaspaIntelligenceService.js"></script>
+  <script src="assets/js/services/HealthMonitor.js"></script>
+  <script src="assets/js/services/CoreEngine.js"></script>
   <script src="assets/js/services.js"></script>
   <script src="assets/js/components.js"></script>
   <script src="assets/js/comparison.js"></script>

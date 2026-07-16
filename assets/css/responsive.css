@@ -84,6 +84,20 @@
 
     }
 
+    #kaspa-network-status{
+
+        grid-column:1;
+
+    }
+
+    .chart-panel{
+
+        grid-column:2;
+
+        grid-row:1 / span 2;
+
+    }
+
     .cycle-strip{
 
         grid-column:1 / -1;

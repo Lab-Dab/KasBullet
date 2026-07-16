@@ -3,7 +3,10 @@
 KasBullet is a static institutional intelligence terminal for Kaspa. The
 homepage foundation is organized around permanent containers for market, supply,
 network, cycle, summary and feed intelligence, backed by shared browser-side
-data services.
+data services. The Core Intelligence Engine initializes the asset registry,
+provider manager, cache, state store, time-series layer, analytics engines,
+comparison engine, Kaspa intelligence service, macro market service, refresh
+scheduler, event bus and health monitor from one permanent entrypoint.
 
 ## Run Locally
 
@@ -22,13 +25,15 @@ browsers, so a local server is recommended.
 
 - CoinGecko public API: KAS, BTC and ETH prices, market caps, dominance context,
   circulating supply, and KAS price history.
+- Kaspa public API: network, blockdag, coin supply and hashrate context where
+  endpoints are available.
+- Stooq daily series: configurable macro history provider for gold, silver, oil,
+  Nasdaq, S&P 500 and DXY comparison containers.
 - `data/news.json`: local generated alert feed.
-- `kas.fyi`: linked for live Kaspa explorer detail.
 
 Unavailable panels display `Unavailable` instead of fabricated values. Global
-M2, exchange balances, cycle scores, AI summaries, metals, commodities, and
-equity indexes need verified providers or models before they should render live
-numbers.
+M2, exchange balances, cycle scores and unsupported future metrics need verified
+providers or models before they should render live numbers.
 
 ## Feed Automation
 

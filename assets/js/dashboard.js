@@ -9,22 +9,15 @@
     historicalDataService,
     kaspaNetworkService,
     backgroundPrefetchManager,
+    assetRegistry,
   } = window.KasBulletCore;
   const ui = window.KasBulletComponents;
   let latestChartPoints = [];
 
-  const marketSnapshotRows = [
-    { label: "BTC", id: "bitcoin" },
-    { label: "ETH", id: "ethereum" },
-    { label: "SOL", id: "solana" },
-    { label: "XRP", id: "ripple" },
-    { label: "Gold" },
-    { label: "Silver" },
-    { label: "Oil" },
-    { label: "DXY" },
-    { label: "Global M2" },
-    { label: "Watchlist" },
-  ];
+  const marketSnapshotRows = assetRegistry
+    .supportedSnapshotAssets()
+    .filter((asset) => asset.id !== "kaspa")
+    .map((asset) => ({ label: asset.symbol || asset.name, id: asset.id, provider: asset.provider }));
 
   function field(name) {
     return document.querySelector(`[data-field="${name}"]`);
@@ -72,6 +65,13 @@
     return `Last Updated ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
   }
 
+  function formatUtcTime(value) {
+    if (!value) return "--";
+    const date = new Date(value);
+    if (Number.isNaN(date.valueOf())) return "--";
+    return date.toISOString().slice(11, 19);
+  }
+
   function changeClass(value) {
     if (typeof value !== "number") return "change neutral";
     if (value > 0) return "change up";
@@ -98,6 +98,12 @@
       title: "Market Snapshot",
       statusId: "market-snapshot-status",
       statusText: "Preparing snapshot",
+    });
+    ui.renderSectionHeader("kaspa-network-status-header", {
+      id: "kaspa-network-status-title",
+      title: "Kaspa Network Status",
+      statusId: "kaspa-network-status-status",
+      statusText: "Preparing network",
     });
     ui.renderSectionHeader("primary-chart-header", {
       id: "primary-chart-title",
@@ -166,6 +172,15 @@
       ui.toolbarButton({ label: "Chart Settings", disabled: true }),
       ui.toolbarButton({ label: "Fullscreen", disabled: true }),
     ].join("");
+    document.getElementById("terminal-legend").innerHTML = [
+      '<span>Legend Ready</span>',
+      '<span>Status Layer Ready</span>',
+      '<span>Comparison Mode Ready</span>',
+    ].join("");
+    document.getElementById("terminal-overlays").innerHTML = [
+      '<span>Overlays Ready</span>',
+      '<span>Future Indicators Ready</span>',
+    ].join("");
   }
 
   function renderInitialState() {
@@ -181,8 +196,17 @@
     ].join("");
 
     document.getElementById("market-snapshot").innerHTML = marketSnapshotRows.map((asset) =>
-      ui.marketRow({ label: asset.label, value: asset.id ? "Loading" : "Unavailable", change: "--" })
+      ui.marketRow({ label: asset.label, value: asset.provider === "coingecko" ? "Loading" : "Unavailable", change: "--" })
     ).join("");
+
+    document.getElementById("kaspa-network-status-grid").innerHTML = [
+      ui.statCard({ label: "Network", value: "Loading", source: "Kaspa Intelligence", field: "networkHealth" }),
+      ui.statCard({ label: "BPS", value: "Loading", source: "Kaspa Intelligence", field: "networkBps" }),
+      ui.statCard({ label: "TPS", value: "Unavailable", source: "Kaspa Intelligence", field: "networkTps" }),
+      ui.statCard({ label: "Hashrate", value: "Loading", source: "Kaspa Intelligence", field: "networkHashrate" }),
+      ui.statCard({ label: "Difficulty", value: "Loading", source: "Kaspa Intelligence", field: "networkDifficulty" }),
+      ui.statCard({ label: "Supply", value: "Loading", source: "Kaspa Intelligence", field: "networkSupply" }),
+    ].join("");
 
     document.getElementById("cycle-strip-grid").innerHTML = [
       "Cycle Score",
@@ -253,7 +277,7 @@
       const change = market?.price_change_percentage_24h;
       return ui.marketRow({
         label: asset.label,
-        value: asset.id ? formatPrice(market?.current_price) : "Unavailable",
+        value: asset.provider === "coingecko" ? formatPrice(market?.current_price) : "Unavailable",
         change: formatPercent(change),
         changeClass: changeClass(change),
       });
@@ -292,6 +316,36 @@
     setStatus("network-panel-status", "unavailable", "Verified provider pending");
   }
 
+  function updateSystemStatus(system) {
+    if (!system) return;
+    const isHealthy = system.status !== "degraded";
+    setText("coreEngineStatus", isHealthy ? "Core Engine Healthy" : "Core Engine Degraded");
+    setText("providerHealth", `Provider Health: ${isHealthy ? "Healthy" : "Degraded"}`);
+    setText("providerCount", `Providers: ${system.availableProviders || 0}/${system.totalProviders || 0}`);
+    setText("latency", `Latency: ${typeof system.latencyMs === "number" ? system.latencyMs : "--"} ms`);
+    setText("lastSync", `Last Sync: ${formatUtcTime(system.checkedAt)} UTC`);
+    setText("connectionStatus", `Connection Status: ${isHealthy ? "Connected" : "Degraded"}`);
+    setText("historicalCache", `Historical Cache: ${system.historicalCache || "Ready"}`);
+    setText("liveStream", `Live Stream: ${system.liveStream || "Connected"}`);
+    const coreStatus = field("coreEngineStatus");
+    if (coreStatus) coreStatus.classList.toggle("status-healthy", isHealthy);
+  }
+
+  function updateKaspaSnapshot(kaspaState) {
+    const data = kaspaState?.data;
+    if (!data) return;
+    setText("networkHealth", data.health || "Unavailable");
+    setText("networkBps", typeof data.bps === "number" ? data.bps.toFixed(2) : "Unavailable");
+    setText("networkTps", typeof data.tps === "number" ? data.tps.toFixed(2) : "Unavailable");
+    setText("networkHashrate", formatCompact(data.hashrate));
+    setText("networkDifficulty", formatCompact(data.difficulty));
+    setText("networkSupply", formatCompact(data.circulatingSupply, " KAS"));
+    setText("networkStrength", typeof data.networkStrength === "number" ? `${data.networkStrength}/100` : "Unavailable");
+    setStatus("kaspa-network-status-status", "live", formatLastUpdated(kaspaState.updatedAt));
+    setStatus("network-intelligence-status", "live", formatLastUpdated(kaspaState.updatedAt));
+    setStatus("network-panel-status", "live", "Kaspa Intelligence connected");
+  }
+
   function renderChart(points) {
     latestChartPoints = points;
     const fallback = document.getElementById("chart-fallback");
@@ -315,16 +369,26 @@
   }
 
   function applyState(state, change) {
+    if (state.system && (!change || change.path === "initial" || change.path === "system")) {
+      updateSystemStatus(state.system);
+    }
+
     if (state.market.status === "live" && state.market.data && (!change || change.path === "market")) {
       updateSnapshot(state.market.data, state.market.updatedAt);
     }
 
-    if (state.network.status === "live" && (!change || change.path === "network")) {
-      setStatus("network-intelligence-status", "live", formatLastUpdated(state.network.updatedAt));
-      setStatus("network-panel-status", "live", "Kaspa API connected");
+    if (state.kaspa.status === "live" && (!change || change.path === "kaspa")) {
+      updateKaspaSnapshot(state.kaspa);
+      const summary = window.KasBulletCore.intelligenceEngine.summarize({
+        market: state.market.data,
+        kaspa: state.kaspa.data,
+      });
+      document.getElementById("summary-panel").innerHTML = `<p>${ui.escapeHtml(summary.market)}</p><p>${ui.escapeHtml(summary.network)}</p>`;
+      setStatus("market-intelligence-summary-status", "live", "Verified summary");
     }
 
-    if (state.network.status === "unavailable" && (!change || change.path === "network")) {
+    if (state.kaspa.status === "unavailable" && (!change || change.path === "kaspa")) {
+      setStatus("kaspa-network-status-status", "unavailable", "Cached or pending network data");
       setStatus("network-intelligence-status", "unavailable", "Cached or pending network data");
       setStatus("network-panel-status", "unavailable", "Verified provider pending");
     }
