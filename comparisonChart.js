@@ -185,7 +185,7 @@
 
       container.innerHTML = `
         <div class="stat-label">${asset.name}</div>
-        <div class="stat-value" style="color:${asset.color}; font-size: var(--font-md);">${asset.symbol}</div>
+        <div class="stat-value comparison-legend-symbol">${asset.symbol}</div>
         <div class="stat-src">Launch: ${launchPoint ? launchPoint.date.toLocaleDateString('en-US') : 'N/A'}</div>
         <div class="stat-src">Launch Price: ${launchPoint ? '$'+launchPoint.value.toPrecision(4) : 'N/A'}</div>
         <div class="stat-src">Current Price: ${currentPoint ? '$'+currentPoint.value.toPrecision(4) : 'N/A'}</div>

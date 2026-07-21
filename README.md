@@ -8,6 +8,9 @@ provider manager, cache, state store, time-series layer, analytics engines,
 comparison engine, Kaspa intelligence service, macro market service, refresh
 scheduler, event bus and health monitor from one permanent entrypoint.
 
+The governing product and architecture blueprint is
+`KASBULLET_CONSTITUTION_v2_MASTER_IMPLEMENTATION_SPECIFICATION.md`.
+
 ## Run Locally
 
 Serve the repository root with any static server:

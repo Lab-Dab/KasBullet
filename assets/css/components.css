@@ -55,6 +55,7 @@
 .module-status[data-status="unavailable"]{ color:var(--text-muted); }
 .module-status[data-status="error"]{ color:var(--color-negative); }
 .module-status[data-status="alert"]{ color:var(--color-negative); }
+.comparison-legend-symbol{ color:var(--color-primary); font-size:var(--font-md); }
 
 .system-status-bar{
     position:sticky;

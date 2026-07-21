@@ -59,6 +59,12 @@
 
     }
 
+    .comparison-card dl{
+
+        grid-template-columns:1fr;
+
+    }
+
     .intelligence-panel-header{
 
         align-items:flex-start;

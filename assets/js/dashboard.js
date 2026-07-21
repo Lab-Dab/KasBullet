@@ -196,6 +196,12 @@
       statusId: "market-intelligence-status",
       statusText: "Preparing market data",
     });
+    ui.renderSectionHeader("kaspa-comparison-header", {
+      id: "kaspa-comparison-title",
+      title: "Kaspa Comparison Terminal",
+      statusId: "kaspa-comparison-status",
+      statusText: "Preparing comparisons",
+    });
     ui.renderSectionHeader("supply-intelligence-header", {
       id: "supply-intelligence-title",
       title: "Supply Intelligence",
@@ -287,6 +293,8 @@
       ui.statCard({ label: "Window Return", value: "Loading", source: "Selected timeframe", field: "chartReturn" }),
       ui.statCard({ label: "24h Change", value: "Loading", source: "CoinGecko", field: "chartChange" }),
     ].join("");
+
+    document.getElementById("kaspa-comparison-grid").innerHTML = ui.loadingSkeleton("Loading Kaspa comparison context.");
 
     document.getElementById("market-grid").innerHTML = ui.intelligencePanel({
       title: "Market Intelligence",
@@ -487,6 +495,47 @@
     }
   }
 
+  function renderComparisonTerminal(results) {
+    const liveResults = results.filter((result) => result?.status === "live");
+    const cards = liveResults.map((result) => {
+      const primaryReturn = result.summary?.primary?.windowReturn;
+      const benchmarkReturn = result.summary?.benchmark?.windowReturn;
+      const spread = Number.isFinite(primaryReturn) && Number.isFinite(benchmarkReturn)
+        ? primaryReturn - benchmarkReturn
+        : null;
+      const correlation = window.KasBulletCore.analyticsEngine.correlation(
+        result.datasets.primary.map((point) => ({ value: point.value })),
+        result.datasets.benchmark.map((point) => ({ value: point.value }))
+      );
+      return `
+        <article class="comparison-card">
+          <h3>KAS / ${ui.escapeHtml(result.asset.symbol || result.asset.name)}</h3>
+          <dl>
+            <div><dt>KAS 1Y</dt><dd>${ui.escapeHtml(formatPercent(primaryReturn))}</dd></div>
+            <div><dt>${ui.escapeHtml(result.asset.symbol || result.asset.name)} 1Y</dt><dd>${ui.escapeHtml(formatPercent(benchmarkReturn))}</dd></div>
+            <div><dt>Spread</dt><dd class="${ui.escapeHtml(changeClass(spread))}">${ui.escapeHtml(formatPercent(spread))}</dd></div>
+            <div><dt>Correlation</dt><dd>${Number.isFinite(correlation) ? correlation.toFixed(2) : "Unavailable"}</dd></div>
+          </dl>
+        </article>
+      `;
+    });
+    document.getElementById("kaspa-comparison-grid").innerHTML = cards.length
+      ? cards.join("")
+      : ui.loadingSkeleton("Comparison data unavailable.");
+    setStatus("kaspa-comparison-status", cards.length ? "live" : "unavailable", cards.length ? "Shared historical cache" : "Comparison data unavailable");
+  }
+
+  function renderComparisonTerminalFromState(comparisons) {
+    const results = ["bitcoin", "ethereum", "solana"]
+      .map((assetId) => comparisons?.[assetId]?.price?.[365])
+      .filter(Boolean);
+    if (!results.length) {
+      setStatus("kaspa-comparison-status", "loading", "Preparing comparisons");
+      return;
+    }
+    renderComparisonTerminal(results);
+  }
+
   function renderBrief(state) {
     const market = state.market.data?.markets?.find((item) => item.id === "kaspa");
     const history = latestChartPoints.map((point) => ({ value: point.price, price: point.price }));
@@ -538,6 +587,10 @@
 
     if (state.feed.status === "live" && (!change || change.path === "feed")) {
       setStatus("market-intelligence-feed-status", "live", formatLastUpdated(state.feed.updatedAt));
+    }
+
+    if (state.comparisons && (!change || change.path === "initial" || change.path.startsWith("comparisons."))) {
+      renderComparisonTerminalFromState(state.comparisons);
     }
   }
 
