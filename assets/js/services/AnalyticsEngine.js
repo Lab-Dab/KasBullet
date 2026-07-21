@@ -11,6 +11,50 @@
       if (!Number.isFinite(first) || !Number.isFinite(last) || first === 0) return null;
       return ((last - first) / first) * 100;
     }
+
+    correlation(primaryPoints, benchmarkPoints) {
+      const primary = (primaryPoints || []).map((point) => point.value ?? point.price).filter(Number.isFinite);
+      const benchmark = (benchmarkPoints || []).map((point) => point.value ?? point.price).filter(Number.isFinite);
+      const length = Math.min(primary.length, benchmark.length);
+      if (length < 3) return null;
+      const primarySlice = primary.slice(-length);
+      const benchmarkSlice = benchmark.slice(-length);
+      const primaryMean = primarySlice.reduce((sum, value) => sum + value, 0) / length;
+      const benchmarkMean = benchmarkSlice.reduce((sum, value) => sum + value, 0) / length;
+      let numerator = 0;
+      let primaryVariance = 0;
+      let benchmarkVariance = 0;
+      for (let index = 0; index < length; index += 1) {
+        const primaryDelta = primarySlice[index] - primaryMean;
+        const benchmarkDelta = benchmarkSlice[index] - benchmarkMean;
+        numerator += primaryDelta * benchmarkDelta;
+        primaryVariance += primaryDelta * primaryDelta;
+        benchmarkVariance += benchmarkDelta * benchmarkDelta;
+      }
+      const denominator = Math.sqrt(primaryVariance * benchmarkVariance);
+      return denominator ? numerator / denominator : null;
+    }
+
+    annualizedVolatility(points) {
+      const values = (points || []).map((point) => point.value ?? point.price).filter((value) => Number.isFinite(value) && value > 0);
+      if (values.length < 3) return null;
+      const returns = values.slice(1).map((value, index) => Math.log(value / values[index]));
+      const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;
+      const variance = returns.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / returns.length;
+      return Math.sqrt(variance) * Math.sqrt(365) * 100;
+    }
+
+    trendRegime(points) {
+      const values = (points || []).map((point) => point.value ?? point.price).filter((value) => Number.isFinite(value) && value > 0);
+      if (values.length < 90) return "sideways";
+      const average = (items) => items.reduce((sum, value) => sum + value, 0) / items.length;
+      const price = values[values.length - 1];
+      const smaShort = average(values.slice(-20));
+      const smaLong = average(values.slice(-90));
+      if (price > smaShort && smaShort > smaLong) return "uptrend";
+      if (price < smaShort && smaShort < smaLong) return "downtrend";
+      return "sideways";
+    }
   }
 
   class NetworkEngine {
@@ -55,6 +99,25 @@
 
     networkStrength(input) {
       return this.network.networkStrength(input);
+    }
+
+    healthBand(score) {
+      if (!Number.isFinite(score)) return { band: "degraded", label: "Unavailable" };
+      if (score >= 80) return { band: "stable", label: "Stable" };
+      if (score >= 60) return { band: "watch", label: "Watch" };
+      return { band: "degraded", label: "Degraded" };
+    }
+
+    correlation(primaryPoints, benchmarkPoints) {
+      return this.market.correlation(primaryPoints, benchmarkPoints);
+    }
+
+    annualizedVolatility(points) {
+      return this.market.annualizedVolatility(points);
+    }
+
+    trendRegime(points) {
+      return this.market.trendRegime(points);
     }
 
     summary(points) {

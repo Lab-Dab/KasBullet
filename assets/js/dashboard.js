@@ -13,10 +13,12 @@
   } = window.KasBulletCore;
   const ui = window.KasBulletComponents;
   let latestChartPoints = [];
+  const snapshotAssetOrder = ["bitcoin", "ethereum", "solana", "binancecoin", "ripple"];
+  const unreadAlertStorageKey = "kasbullet:read-alerts:v1";
 
-  const marketSnapshotRows = assetRegistry
-    .supportedSnapshotAssets()
-    .filter((asset) => asset.id !== "kaspa")
+  const marketSnapshotRows = snapshotAssetOrder
+    .map((id) => assetRegistry.get(id))
+    .filter(Boolean)
     .map((asset) => ({ label: asset.symbol || asset.name, id: asset.id, provider: asset.provider }));
 
   function field(name) {
@@ -79,6 +81,76 @@
     return "change neutral";
   }
 
+  function fearGreedLabel(score) {
+    if (!Number.isFinite(score)) return "Unavailable";
+    if (score <= 24) return "Extreme Fear";
+    if (score <= 44) return "Fear";
+    if (score <= 54) return "Neutral";
+    if (score <= 74) return "Greed";
+    return "Extreme Greed";
+  }
+
+  function altcoinSeasonLabel(score) {
+    if (!Number.isFinite(score)) return "Unavailable";
+    if (score < 25) return "Bitcoin Season";
+    if (score <= 75) return "Neutral";
+    return "Altcoin Season";
+  }
+
+  function readAlertIds() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(unreadAlertStorageKey) || "[]"));
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function writeAlertIds(ids) {
+    try {
+      localStorage.setItem(unreadAlertStorageKey, JSON.stringify(Array.from(ids).slice(-200)));
+    } catch (_) {
+      return;
+    }
+  }
+
+  function alertId(item) {
+    return [item.category || "feed", item.headline || "alert", item.publishedAt || item.story || ""].join(":");
+  }
+
+  function normalizeAlerts(feed = []) {
+    return feed.map((item) => ({
+      ...item,
+      id: alertId(item),
+      category: item.category || "Market",
+      severity: item.severity || "Notable",
+      source: item.source || item.channelTitle || "Local feed",
+      description: item.story || item.headline || "Verified alert pending.",
+    }));
+  }
+
+  function latestUnreadAlert(feed = []) {
+    const readIds = readAlertIds();
+    const severityRank = { Major: 3, Significant: 2, Notable: 1 };
+    return normalizeAlerts(feed)
+      .filter((item) => !readIds.has(item.id))
+      .sort((a, b) => (severityRank[b.severity] || 0) - (severityRank[a.severity] || 0))[0] || null;
+  }
+
+  function smallSparkline(values = []) {
+    const points = values.filter(Number.isFinite).slice(-7);
+    if (points.length < 2) return '<svg class="sparkline" aria-hidden="true"></svg>';
+    const min = Math.min(...points);
+    const max = Math.max(...points);
+    const range = max - min || 1;
+    const path = points.map((value, index) => {
+      const x = (index / (points.length - 1)) * 100;
+      const y = 28 - ((value - min) / range) * 28;
+      return `${index ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+    }).join(" ");
+    const direction = points[points.length - 1] > points[0] ? "up" : points[points.length - 1] < points[0] ? "down" : "neutral";
+    return `<svg class="sparkline sparkline--${direction}" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"></path></svg>`;
+  }
+
   function calcReturn(points) {
     if (!points.length || typeof points[0].price !== "number") return null;
     const first = points[0].price;
@@ -95,7 +167,7 @@
     });
     ui.renderSectionHeader("market-snapshot-header", {
       id: "market-snapshot-title",
-      title: "Market Snapshot",
+      title: "KasBullet Snapshot",
       statusId: "market-snapshot-status",
       statusText: "Preparing snapshot",
     });
@@ -138,21 +210,21 @@
     });
     ui.renderSectionHeader("cycle-intelligence-header", {
       id: "cycle-intelligence-title",
-      title: "Cycle Intelligence",
+      title: "Kaspa Market Cap Terminal",
       statusId: "cycle-intelligence-status",
       status: "unavailable",
       statusText: "Models not enabled",
     });
     ui.renderSectionHeader("market-intelligence-summary-header", {
       id: "market-intelligence-summary-title",
-      title: "Market Intelligence Summary",
+      title: "KasBullet Brief",
       statusId: "market-intelligence-summary-status",
       status: "unavailable",
       statusText: "Factual summary",
     });
     ui.renderSectionHeader("market-intelligence-feed-header", {
       id: "market-intelligence-feed-title",
-      title: "Market Intelligence Feed",
+      title: "Latest Alerts",
       statusId: "market-intelligence-feed-status",
       statusText: "Preparing feed",
     });
@@ -160,39 +232,33 @@
 
   function renderChartToolbar() {
     document.getElementById("chart-toolbar").innerHTML = [
-      ui.toolbarButton({ label: "Compare", disabled: true }),
-      ui.toolbarButton({ label: "Indicators", disabled: true }),
-      ui.toolbarButton({ label: "Drawing Tools", disabled: true }),
       '<div class="timeframe-group" role="group" aria-label="KAS chart timeframe">',
-      '<button type="button" class="timeframe" data-timeframe="7" aria-pressed="false">1W</button>',
-      '<button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>',
-      '<button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>',
+      '<button type="button" class="timeframe" data-timeframe="max" aria-pressed="false">ALL</button>',
+      '<button type="button" class="timeframe" data-timeframe="1460" aria-pressed="false">4Y</button>',
+      '<button type="button" class="timeframe" data-timeframe="730" aria-pressed="false">2Y</button>',
       '<button type="button" class="timeframe" data-timeframe="365" aria-pressed="false">1Y</button>',
+      '<button type="button" class="timeframe" data-timeframe="180" aria-pressed="false">6M</button>',
+      '<button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>',
+      '<button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>',
       '</div>',
-      ui.toolbarButton({ label: "Chart Settings", disabled: true }),
-      ui.toolbarButton({ label: "Fullscreen", disabled: true }),
+      '<button type="button" class="toolbar-button" data-chart-scale="log" aria-pressed="true">Log</button>',
+      ui.toolbarButton({ label: "Overlays", disabled: true }),
     ].join("");
     document.getElementById("terminal-legend").innerHTML = [
-      '<span>Legend Ready</span>',
-      '<span>Status Layer Ready</span>',
-      '<span>Comparison Mode Ready</span>',
+      '<span>KAS price since genesis</span>',
+      '<span>Log scale default</span>',
     ].join("");
-    document.getElementById("terminal-overlays").innerHTML = [
-      '<span>Overlays Ready</span>',
-      '<span>Future Indicators Ready</span>',
-    ].join("");
+    document.getElementById("terminal-overlays").innerHTML = '<span>Overlays unavailable until verified secondary series are connected</span>';
   }
 
   function renderInitialState() {
     document.getElementById("ribbon-grid").innerHTML = [
-      ui.metricCard({ label: "Price", value: "Loading", note: "CoinGecko public API", field: "ribbonPrice", noteField: "ribbonPriceNote" }),
-      ui.metricCard({ label: "Network Strength", value: "10 BPS", note: "Kaspa network target", field: "networkStrength" }),
-      ui.metricCard({ label: "Cycle Score", value: "Unavailable", note: "Future model container", field: "cycleScore" }),
-      ui.metricCard({ label: "Market Risk", value: "Unavailable", note: "Future model container", field: "marketRisk" }),
-      ui.metricCard({ label: "Bottom Probability", value: "Unavailable", note: "Future model container", field: "bottomProbability" }),
-      ui.metricCard({ label: "Peak Probability", value: "Unavailable", note: "Future model container", field: "peakProbability" }),
-      ui.metricCard({ label: "Liquidity", value: "Unavailable", note: "Provider not configured", field: "liquidity" }),
-      ui.metricCard({ label: "Conviction", value: "Unavailable", note: "Future supply model container", field: "conviction" }),
+      ui.metricCard({ label: "Live Status", value: "Loading", note: "Preparing sync", field: "ribbonSync" }),
+      ui.metricCard({ label: "Network Health", value: "Loading", note: "Kaspa Intelligence", field: "ribbonHealth", noteField: "ribbonHealthNote", jump: "#network-intelligence" }),
+      ui.metricCard({ label: "KAS Price", value: "Loading", note: "24h --", field: "ribbonPrice", noteField: "ribbonPriceNote", jump: "#primary-chart-header" }),
+      ui.metricCard({ label: "Hashrate", value: "Loading", note: "vs 30d avg unavailable", field: "ribbonHashrate", noteField: "ribbonHashrateNote", jump: "#network-intelligence" }),
+      ui.metricCard({ label: "Fear & Greed", value: "Loading", note: "Alternative.me", field: "ribbonFearGreed", noteField: "ribbonFearGreedNote", jump: "#market-intelligence" }),
+      ui.metricCard({ label: "Latest Alert", value: "No active alerts", note: "Unread feed", field: "ribbonAlert", noteField: "ribbonAlertNote", jump: "#market-intelligence-feed" }),
     ].join("");
 
     document.getElementById("market-snapshot").innerHTML = marketSnapshotRows.map((asset) =>
@@ -211,8 +277,6 @@
     document.getElementById("cycle-strip-grid").innerHTML = [
       "Cycle Score",
       "Market Risk",
-      "Bottom Probability",
-      "Peak Probability",
       "Conviction",
       "Liquidity",
       "Network Strength",
@@ -248,41 +312,78 @@
       statusId: "network-panel-status",
     });
 
-    document.getElementById("cycle-grid").innerHTML = ui.intelligencePanel({
-      title: "Cycle Intelligence",
-      headline: "Unavailable",
-      chartLabel: "Cycle intelligence interactive chart container",
-      insight: "Cycle models are intentionally not implemented in this refinement pass.",
-      statusId: "cycle-panel-status",
-    });
+    document.getElementById("cycle-grid").innerHTML = '<p class="empty-state">Market cap ladder data is unavailable until live ranking thresholds are connected.</p>';
 
     document.getElementById("summary-panel").innerHTML =
-      '<p>Market intelligence summary containers are ready for objective market conditions. No financial advice, predictions, or opinions are generated in this milestone.</p>';
+      '<p>KasBullet Brief is preparing objective market conditions. Not analysis or advice.</p>';
     document.getElementById("feed-category-grid").innerHTML = [
+      "All",
       "Market",
       "Network",
       "Development",
+      "Ecosystem",
       "Macro",
-      "Liquidity",
-      "Wallets",
-      "Research",
     ].map((label) => ui.feedCategory({ label })).join("");
     document.getElementById("alerts-grid").innerHTML = ui.loadingSkeleton("Loading latest verified alerts.");
   }
 
-  function renderMarketSnapshot(markets) {
+  function renderMarketSnapshot(markets, global, altcoinSeason) {
     const marketById = new Map(markets.map((market) => [market.id, market]));
+    const kaspaChange = marketById.get("kaspa")?.price_change_percentage_24h;
+    const outperformCount = marketSnapshotRows.filter((asset) => {
+      const change = marketById.get(asset.id)?.price_change_percentage_24h;
+      return Number.isFinite(kaspaChange) && Number.isFinite(change) && kaspaChange > change;
+    }).length;
     const rows = marketSnapshotRows.map((asset) => {
       const market = marketById.get(asset.id);
       const change = market?.price_change_percentage_24h;
-      return ui.marketRow({
-        label: asset.label,
-        value: asset.provider === "coingecko" ? formatPrice(market?.current_price) : "Unavailable",
-        change: formatPercent(change),
-        changeClass: changeClass(change),
-      });
+      return `
+        <button type="button" class="market-row market-row--benchmark" data-benchmark="${ui.escapeHtml(asset.id)}">
+          <span>${ui.escapeHtml(asset.label)}</span>
+          <span>${ui.escapeHtml(formatPrice(market?.current_price))}</span>
+          ${smallSparkline(market?.sparkline_in_7d?.price || [])}
+          <span class="${ui.escapeHtml(changeClass(change))}">${ui.escapeHtml(formatPercent(change))}</span>
+          <span class="correlation-badge">corr --</span>
+        </button>
+      `;
     });
-    document.getElementById("market-snapshot").innerHTML = rows.join("");
+    const btcDominance = global?.data?.market_cap_percentage?.btc;
+    const totalMarketCap = global?.data?.total_market_cap?.usd;
+    const stablecoinMarketCap = global?.data?.total_market_cap?.usd
+      ? null
+      : null;
+    const altcoinScore = typeof altcoinSeason?.value === "number" ? altcoinSeason.value : null;
+    document.getElementById("market-snapshot").innerHTML = [
+      `<p class="snapshot-summary">KAS is outperforming ${outperformCount} of 5 majors today</p>`,
+      ...rows,
+      '<div class="snapshot-index-strip">',
+      `<article><span>BTC Dominance</span><strong>${Number.isFinite(btcDominance) ? `${btcDominance.toFixed(1)}%` : "Unavailable"}</strong><meter class="gauge" min="0" max="100" value="${Number.isFinite(btcDominance) ? Math.min(100, btcDominance).toFixed(1) : 0}"></meter></article>`,
+      `<article><span>Altcoin Season</span><strong>${Number.isFinite(altcoinScore) ? altcoinScore : "Unavailable"}</strong><small>${ui.escapeHtml(altcoinSeasonLabel(altcoinScore))}</small></article>`,
+      `<article><span>Total Crypto Cap</span><strong>${formatCompact(totalMarketCap)}</strong></article>`,
+      `<article><span>Stablecoin Cap</span><strong>${formatCompact(stablecoinMarketCap)}</strong><small>Provider pending</small></article>`,
+      '</div>',
+    ].join("");
+  }
+
+  async function updateSnapshotCorrelations() {
+    try {
+      const kaspaHistory = await historicalDataService.getHistory("kaspa", 90);
+      await Promise.all(marketSnapshotRows.map(async (asset) => {
+        const row = document.querySelector(`[data-benchmark="${asset.id}"] .correlation-badge`);
+        if (!row) return;
+        try {
+          const benchmarkHistory = await historicalDataService.getHistory(asset.id, 90);
+          const correlation = window.KasBulletCore.analyticsEngine.correlation(kaspaHistory, benchmarkHistory);
+          row.textContent = Number.isFinite(correlation) ? `corr ${correlation.toFixed(2)}` : "corr --";
+        } catch (_) {
+          row.textContent = "corr --";
+        }
+      }));
+    } catch (_) {
+      document.querySelectorAll(".correlation-badge").forEach((row) => {
+        row.textContent = "corr --";
+      });
+    }
   }
 
   function updateSnapshot({ markets, global }, updatedAt) {
@@ -297,6 +398,7 @@
 
     setText("ribbonPrice", price);
     setText("ribbonPriceNote", `24h ${formatPercent(change)}`);
+    setText("ribbonSync", "Live");
     setText("chartPrice", price);
     setText("chartChange", formatPercent(change));
     if (field("chartChange")) field("chartChange").className = `stat-value ${changeClass(change)}`;
@@ -305,7 +407,12 @@
     if (marketHeadline) marketHeadline.textContent = price;
     if (supplyHeadline) supplyHeadline.textContent = formatCompact(kaspa?.circulating_supply, " KAS");
 
-    renderMarketSnapshot(markets);
+    const currentMarketState = stateStore.getState().market.data || {};
+    const fearGreedScore = Number(currentMarketState.fearGreed?.data?.[0]?.value);
+    setText("ribbonFearGreed", Number.isFinite(fearGreedScore) ? String(fearGreedScore) : "Unavailable");
+    setText("ribbonFearGreedNote", fearGreedLabel(fearGreedScore));
+    renderMarketSnapshot(markets, global, currentMarketState.altcoinSeason);
+    updateSnapshotCorrelations();
     setStatus("ribbon-status", "live", formatLastUpdated(updatedAt));
     setStatus("market-snapshot-status", "live", formatLastUpdated(updatedAt));
     setStatus("market-intelligence-status", "live", "Live via CoinGecko");
@@ -340,7 +447,11 @@
     setText("networkHashrate", formatCompact(data.hashrate));
     setText("networkDifficulty", formatCompact(data.difficulty));
     setText("networkSupply", formatCompact(data.circulatingSupply, " KAS"));
-    setText("networkStrength", typeof data.networkStrength === "number" ? `${data.networkStrength}/100` : "Unavailable");
+    const healthBand = window.KasBulletCore.analyticsEngine.healthBand(data.networkStrength);
+    setText("ribbonHealth", typeof data.networkStrength === "number" ? `${data.networkStrength}/100` : "Unavailable");
+    setText("ribbonHealthNote", healthBand.label);
+    setText("ribbonHashrate", formatCompact(data.hashrate));
+    setText("ribbonHashrateNote", "vs 30d avg unavailable");
     setStatus("kaspa-network-status-status", "live", formatLastUpdated(kaspaState.updatedAt));
     setStatus("network-intelligence-status", "live", formatLastUpdated(kaspaState.updatedAt));
     setStatus("network-panel-status", "live", "Kaspa Intelligence connected");
@@ -362,10 +473,47 @@
       return;
     }
 
-    if (canvas) canvas.hidden = false;
-    if (fallback) fallback.hidden = true;
-    window.KasBulletChart.drawKasChart(canvas, points);
-    setStatus("primary-chart-status", "live", "Live via CoinGecko");
+    try {
+      if (canvas) canvas.hidden = false;
+      if (fallback) fallback.hidden = true;
+      window.KasBulletChart.drawKasChart(canvas, points);
+      setStatus("primary-chart-status", "live", "Live via CoinGecko");
+    } catch (error) {
+      if (fallback) {
+        fallback.hidden = false;
+        fallback.textContent = "Chart temporarily unavailable. Last data fetch remains cached.";
+      }
+      setStatus("primary-chart-status", "error", "Chart temporarily unavailable");
+    }
+  }
+
+  function renderBrief(state) {
+    const market = state.market.data?.markets?.find((item) => item.id === "kaspa");
+    const history = latestChartPoints.map((point) => ({ value: point.price, price: point.price }));
+    const trend = window.KasBulletCore.analyticsEngine.trendRegime(history);
+    const volatility = window.KasBulletCore.analyticsEngine.annualizedVolatility(history);
+    const volatilityLabel = Number.isFinite(volatility)
+      ? volatility >= 90 ? "elevated" : volatility <= 45 ? "low" : "normal"
+      : "unavailable";
+    const change = market?.price_change_percentage_24h;
+    const developments = Number.isFinite(change) && change > 2
+      ? [`KAS price up ${change.toFixed(2)}% over 24h.`]
+      : [];
+    const risks = Number.isFinite(change) && change < -2
+      ? [`KAS price down ${Math.abs(change).toFixed(2)}% over 24h.`]
+      : [];
+    document.getElementById("summary-panel").innerHTML = `
+      <div class="brief-badges">
+        <span>Trend: ${ui.escapeHtml(trend)}</span>
+        <span>Volatility: ${ui.escapeHtml(volatilityLabel)}</span>
+      </div>
+      <div class="brief-grid">
+        <article><h3>Strongest Positive Developments</h3><p>${developments.length ? developments.map(ui.escapeHtml).join("<br>") : "No significant developments today."}</p></article>
+        <article><h3>Primary Risks</h3><p>${risks.length ? risks.map(ui.escapeHtml).join("<br>") : "No significant risks today."}</p></article>
+      </div>
+      <p class="metric-note">Objective summary of current conditions, not analysis or advice.</p>
+    `;
+    setStatus("market-intelligence-summary-status", "live", "Templated brief");
   }
 
   function applyState(state, change) {
@@ -379,12 +527,7 @@
 
     if (state.kaspa.status === "live" && (!change || change.path === "kaspa")) {
       updateKaspaSnapshot(state.kaspa);
-      const summary = window.KasBulletCore.intelligenceEngine.summarize({
-        market: state.market.data,
-        kaspa: state.kaspa.data,
-      });
-      document.getElementById("summary-panel").innerHTML = `<p>${ui.escapeHtml(summary.market)}</p><p>${ui.escapeHtml(summary.network)}</p>`;
-      setStatus("market-intelligence-summary-status", "live", "Verified summary");
+      renderBrief(state);
     }
 
     if (state.kaspa.status === "unavailable" && (!change || change.path === "kaspa")) {
@@ -412,11 +555,13 @@
 
   async function loadChart() {
     const pressed = document.querySelector(".timeframe[aria-pressed='true']");
-    const days = Number(pressed?.dataset.timeframe || 30);
+    const timeframe = pressed?.dataset.timeframe || "30";
+    const days = timeframe === "max" ? "max" : Number(timeframe);
     try {
       setStatus("primary-chart-status", "loading", "Loading chart");
       const points = await historicalDataService.getHistory("kaspa", days);
       renderChart(points.map((point) => ({ ...point, price: point.value })));
+      renderBrief(stateStore.getState());
     } catch (error) {
       setStatus("primary-chart-status", "error", "Chart data unavailable");
       renderChart([]);
@@ -427,9 +572,28 @@
     const grid = document.getElementById("alerts-grid");
     if (!grid) return;
     try {
-      await dataService.getAlerts();
-      grid.innerHTML = ui.loadingSkeleton("Verified market intelligence feed pending.");
-      setStatus("market-intelligence-feed-status", "unavailable", "Categories ready");
+      const feed = normalizeAlerts(await dataService.getAlerts());
+      const readIds = readAlertIds();
+      const unread = feed.filter((item) => !readIds.has(item.id));
+      const latest = latestUnreadAlert(feed);
+      setText("ribbonAlert", latest ? latest.headline || latest.description : "No active alerts");
+      setText("ribbonAlertNote", latest ? latest.severity : "Unread feed clear");
+      document.querySelectorAll("[data-field='ribbonAlert']").forEach((element) => {
+        element.closest(".metric-card")?.setAttribute("data-clickable", "true");
+        element.closest(".metric-card")?.setAttribute("data-jump", "#market-intelligence-feed");
+      });
+      document.getElementById("feed-category-grid").innerHTML = [
+        "All",
+        "Market",
+        "Network",
+        "Development",
+        "Ecosystem",
+        "Macro",
+      ].map((label) => ui.feedCategory({ label, unread: label === "All" ? unread.length > 0 : unread.some((item) => item.category === label) })).join("");
+      grid.innerHTML = feed.length
+        ? feed.map((item) => ui.alertCard({ ...item, read: readIds.has(item.id) })).join("")
+        : ui.loadingSkeleton("No alerts in this category yet.");
+      setStatus("market-intelligence-feed-status", feed.length ? "live" : "unavailable", feed.length ? `${unread.length} new` : "Categories ready");
     } catch (error) {
       grid.innerHTML = ui.loadingSkeleton("Alert feed unavailable.");
       setStatus("market-intelligence-feed-status", "error", "Feed unavailable");
@@ -443,6 +607,23 @@
         button.setAttribute("aria-pressed", "true");
         loadChart();
       });
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-jump]");
+      const destination = target ? document.querySelector(target.dataset.jump) : null;
+      if (!destination) return;
+      destination.scrollIntoView({ behavior: "smooth", block: "start" });
+      const alertField = target.querySelector("[data-field='ribbonAlert']");
+      if (alertField) {
+        const latest = latestUnreadAlert(stateStore.getState().feed.data);
+        if (latest) {
+          const readIds = readAlertIds();
+          readIds.add(latest.id);
+          writeAlertIds(readIds);
+          loadAlerts();
+        }
+      }
     });
 
     window.addEventListener("resize", () => {

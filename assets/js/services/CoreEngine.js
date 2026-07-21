@@ -88,8 +88,24 @@
           const points = await this.historicalMarketService.getHistory("kaspa", days);
           return points.map((point) => ({ date: point.date, price: point.value, value: point.value, timestamp: point.timestamp }));
         },
-        getDashboardSnapshot: () =>
-          this.historicalMarketService.getCurrentMarkets(["kaspa", "bitcoin", "ethereum"]),
+        getDashboardSnapshot: async () => {
+          const snapshot = await this.historicalMarketService.getCurrentMarkets([
+            "kaspa",
+            "bitcoin",
+            "ethereum",
+            "solana",
+            "binancecoin",
+            "ripple",
+          ]);
+          const [fearGreed, altcoinSeason] = await Promise.allSettled([
+            this.providerManager.request("coingecko", "getFearGreed", {}, "fear-greed", this.refreshIntervals.macro),
+            this.providerManager.request("coingecko", "getAltcoinSeason", {}, "altcoin-season", this.refreshIntervals.macro),
+          ]);
+          snapshot.fearGreed = fearGreed.status === "fulfilled" ? fearGreed.value : null;
+          snapshot.altcoinSeason = altcoinSeason.status === "fulfilled" ? altcoinSeason.value : null;
+          this.stateStore.merge("market", { data: snapshot, updatedAt: new Date().toISOString() });
+          return snapshot;
+        },
         getAlerts: async () => {
           const data = await this.providerManager.request("localFeed", "getAlerts", {}, "local-alerts", 30 * 1000);
           this.stateStore.merge("feed", {
@@ -105,7 +121,7 @@
 
     initialize() {
       this.backgroundPrefetchManager.register("historical-market-data", () =>
-        this.historicalMarketService.getCurrentMarkets(["kaspa", "bitcoin", "ethereum"])
+        this.historicalMarketService.getCurrentMarkets(["kaspa", "bitcoin", "ethereum", "solana", "binancecoin", "ripple"])
       );
       this.backgroundPrefetchManager.register("kaspa-intelligence", () => this.kaspaIntelligenceService.getSnapshot());
       this.backgroundPrefetchManager.register("kaspa-history", () => this.historicalMarketService.getHistory("kaspa", 365));

@@ -39,9 +39,23 @@
     }
 
     .chart-stats,
+    .snapshot-index-strip,
+    .brief-grid,
     .intelligence-panel{
 
         grid-template-columns:1fr;
+
+    }
+
+    .market-row{
+
+        grid-template-columns:44px minmax(74px, 1fr) minmax(58px, .7fr) auto;
+
+    }
+
+    .market-row .sparkline{
+
+        display:none;
 
     }
 

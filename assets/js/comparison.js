@@ -7,12 +7,13 @@
 
   function normalizePoints(points) {
     if (!Array.isArray(points) || points.length === 0) return [];
-    const prices = points.map((point) => point.price).filter((price) => typeof price === "number");
+    const validPoints = points.filter((point) => Number.isFinite(point.price) && point.price > 0 && point.date instanceof Date);
+    const prices = validPoints.map((point) => point.price);
     if (prices.length === 0) return [];
     const min = Math.min(...prices);
     const max = Math.max(...prices);
     const range = max - min || 1;
-    return points.map((point) => ({
+    return validPoints.map((point) => ({
       ...point,
       normalized: typeof point.price === "number" ? (point.price - min) / range : 0,
     }));
@@ -21,6 +22,7 @@
   function drawKasChart(canvas, points) {
     if (!canvas) return;
     const context = canvas.getContext("2d");
+    if (!context) return;
     const rect = canvas.getBoundingClientRect();
     const ratio = window.devicePixelRatio || 1;
     canvas.width = Math.max(1, Math.floor(rect.width * ratio));
@@ -60,23 +62,6 @@
     const xFor = (index) => padding.left + (chartWidth * index) / (normalized.length - 1);
     const yFor = (point) => padding.top + chartHeight - point.normalized * chartHeight;
 
-    const gradient = context.createLinearGradient(0, padding.top, 0, height - padding.bottom);
-    gradient.addColorStop(0, "rgba(73, 234, 203, .26)");
-    gradient.addColorStop(1, "rgba(73, 234, 203, 0)");
-
-    context.beginPath();
-    normalized.forEach((point, index) => {
-      const x = xFor(index);
-      const y = yFor(point);
-      if (index === 0) context.moveTo(x, y);
-      else context.lineTo(x, y);
-    });
-    context.lineTo(width - padding.right, height - padding.bottom);
-    context.lineTo(padding.left, height - padding.bottom);
-    context.closePath();
-    context.fillStyle = gradient;
-    context.fill();
-
     context.beginPath();
     normalized.forEach((point, index) => {
       const x = xFor(index);
@@ -85,7 +70,9 @@
       else context.lineTo(x, y);
     });
     context.strokeStyle = primaryColor;
-    context.lineWidth = 2;
+    context.lineWidth = 1.8;
+    context.lineJoin = "round";
+    context.lineCap = "round";
     context.stroke();
 
     const first = normalized[0];
