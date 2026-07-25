@@ -261,6 +261,7 @@
       id: "localFeed",
       priority: 1,
       getAlerts: () => getJson("data/news.json", "Local feed"),
+      getKaspaEvents: () => getJson("data/kaspa-events.json", "Kaspa event timeline"),
     },
   ];
 

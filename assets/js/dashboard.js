@@ -13,6 +13,12 @@
   } = window.KasBulletCore;
   const ui = window.KasBulletComponents;
   let latestChartPoints = [];
+  let fullChartHistory = [];
+  let chartEvents = [];
+  let currentTimeframe = "max";
+  let currentChartScale = "log";
+  let chartFrameRequest = null;
+  let pendingChartRender = null;
   const snapshotAssetOrder = ["bitcoin", "ethereum", "solana", "binancecoin", "ripple"];
   const unreadAlertStorageKey = "kasbullet:read-alerts:v1";
 
@@ -67,6 +73,14 @@
     return `Last Updated ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
   }
 
+  function formatSyncedAgo(value) {
+    if (!value) return "Sync pending";
+    const date = new Date(value);
+    if (Number.isNaN(date.valueOf())) return "Sync pending";
+    const seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+    return seconds < 60 ? `Synced ${seconds}s ago` : `Synced ${Math.round(seconds / 60)}m ago`;
+  }
+
   function formatUtcTime(value) {
     if (!value) return "--";
     const date = new Date(value);
@@ -95,6 +109,13 @@
     if (score < 25) return "Bitcoin Season";
     if (score <= 75) return "Neutral";
     return "Altcoin Season";
+  }
+
+  function altcoinSeasonBand(score) {
+    if (!Number.isFinite(score)) return "unavailable";
+    if (score < 25) return "low";
+    if (score <= 75) return "mid";
+    return "high";
   }
 
   function readAlertIds() {
@@ -158,6 +179,22 @@
     return ((last - first) / first) * 100;
   }
 
+  function cutoffForTimeframe(points, timeframe) {
+    if (timeframe === "max" || !points.length) return points;
+    const days = Number(timeframe);
+    if (!Number.isFinite(days)) return points;
+    const lastTime = points[points.length - 1].date.getTime();
+    const cutoff = lastTime - days * 24 * 60 * 60 * 1000;
+    return points.filter((point) => point.date.getTime() >= cutoff);
+  }
+
+  function validatedChartPoints(points) {
+    return (points || [])
+      .map((point) => ({ ...point, price: Number(point.price ?? point.value), date: point.date instanceof Date ? point.date : new Date(point.date || point.timestamp) }))
+      .filter((point) => Number.isFinite(point.price) && point.price > 0 && !Number.isNaN(point.date.valueOf()))
+      .sort((a, b) => a.date - b.date);
+  }
+
   function renderSectionHeaders() {
     ui.renderSectionHeader("ribbon-header", {
       id: "ribbon-title",
@@ -180,6 +217,7 @@
     ui.renderSectionHeader("primary-chart-header", {
       id: "primary-chart-title",
       title: "Kaspa Market Terminal",
+      subtitle: "Price Since Genesis",
       statusId: "primary-chart-status",
       statusText: "Preparing chart",
     });
@@ -239,15 +277,16 @@
   function renderChartToolbar() {
     document.getElementById("chart-toolbar").innerHTML = [
       '<div class="timeframe-group" role="group" aria-label="KAS chart timeframe">',
-      '<button type="button" class="timeframe" data-timeframe="max" aria-pressed="false">ALL</button>',
+      '<button type="button" class="timeframe" data-timeframe="max" aria-pressed="true">ALL</button>',
       '<button type="button" class="timeframe" data-timeframe="1460" aria-pressed="false">4Y</button>',
       '<button type="button" class="timeframe" data-timeframe="730" aria-pressed="false">2Y</button>',
       '<button type="button" class="timeframe" data-timeframe="365" aria-pressed="false">1Y</button>',
       '<button type="button" class="timeframe" data-timeframe="180" aria-pressed="false">6M</button>',
       '<button type="button" class="timeframe" data-timeframe="90" aria-pressed="false">3M</button>',
-      '<button type="button" class="timeframe" data-timeframe="30" aria-pressed="true">1M</button>',
+      '<button type="button" class="timeframe" data-timeframe="30" aria-pressed="false">1M</button>',
       '</div>',
       '<button type="button" class="toolbar-button" data-chart-scale="log" aria-pressed="true">Log</button>',
+      '<button type="button" class="toolbar-button" data-chart-scale="linear" aria-pressed="false">Linear</button>',
       ui.toolbarButton({ label: "Overlays", disabled: true }),
     ].join("");
     document.getElementById("terminal-legend").innerHTML = [
@@ -259,8 +298,14 @@
 
   function renderInitialState() {
     document.getElementById("ribbon-grid").innerHTML = [
-      ui.metricCard({ label: "Live Status", value: "Loading", note: "Preparing sync", field: "ribbonSync" }),
-      ui.metricCard({ label: "Network Health", value: "Loading", note: "Kaspa Intelligence", field: "ribbonHealth", noteField: "ribbonHealthNote", jump: "#network-intelligence" }),
+      '<article class="metric-card metric-card--status">',
+      '<h3 class="metric-title">Live Status</h3>',
+      '<span class="module-status" data-status="loading" data-field="ribbonSync">Preparing sync</span>',
+      '</article>',
+      '<article class="metric-card metric-card--health" data-clickable="true" data-jump="#network-intelligence">',
+      '<span class="network-health-badge" data-band="degraded" data-field="ribbonHealthBadge">--</span>',
+      '<span><span class="metric-title">Network Health</span><span class="metric-note" data-field="ribbonHealthNote">Kaspa Intelligence</span></span>',
+      '</article>',
       ui.metricCard({ label: "KAS Price", value: "Loading", note: "24h --", field: "ribbonPrice", noteField: "ribbonPriceNote", jump: "#primary-chart-header" }),
       ui.metricCard({ label: "Hashrate", value: "Loading", note: "vs 30d avg unavailable", field: "ribbonHashrate", noteField: "ribbonHashrateNote", jump: "#network-intelligence" }),
       ui.metricCard({ label: "Fear & Greed", value: "Loading", note: "Alternative.me", field: "ribbonFearGreed", noteField: "ribbonFearGreedNote", jump: "#market-intelligence" }),
@@ -272,12 +317,10 @@
     ).join("");
 
     document.getElementById("kaspa-network-status-grid").innerHTML = [
-      ui.statCard({ label: "Network", value: "Loading", source: "Kaspa Intelligence", field: "networkHealth" }),
+      ui.statCard({ label: "Network", value: "Loading", source: "Kaspa Intelligence", field: "networkName" }),
       ui.statCard({ label: "BPS", value: "Loading", source: "Kaspa Intelligence", field: "networkBps" }),
       ui.statCard({ label: "TPS", value: "Unavailable", source: "Kaspa Intelligence", field: "networkTps" }),
-      ui.statCard({ label: "Hashrate", value: "Loading", source: "Kaspa Intelligence", field: "networkHashrate" }),
-      ui.statCard({ label: "Difficulty", value: "Loading", source: "Kaspa Intelligence", field: "networkDifficulty" }),
-      ui.statCard({ label: "Supply", value: "Loading", source: "Kaspa Intelligence", field: "networkSupply" }),
+      ui.statCard({ label: "Blocks", value: "Loading", source: "Kaspa Intelligence", field: "networkBlocks" }),
     ].join("");
 
     document.getElementById("cycle-strip-grid").innerHTML = [
@@ -346,7 +389,7 @@
       const market = marketById.get(asset.id);
       const change = market?.price_change_percentage_24h;
       return `
-        <button type="button" class="market-row market-row--benchmark" data-benchmark="${ui.escapeHtml(asset.id)}">
+        <button type="button" class="market-row market-row--benchmark" data-benchmark="${ui.escapeHtml(asset.id)}" data-jump="#kaspa-comparison-terminal">
           <span>${ui.escapeHtml(asset.label)}</span>
           <span>${ui.escapeHtml(formatPrice(market?.current_price))}</span>
           ${smallSparkline(market?.sparkline_in_7d?.price || [])}
@@ -366,32 +409,25 @@
       ...rows,
       '<div class="snapshot-index-strip">',
       `<article><span>BTC Dominance</span><strong>${Number.isFinite(btcDominance) ? `${btcDominance.toFixed(1)}%` : "Unavailable"}</strong><meter class="gauge" min="0" max="100" value="${Number.isFinite(btcDominance) ? Math.min(100, btcDominance).toFixed(1) : 0}"></meter></article>`,
-      `<article><span>Altcoin Season</span><strong>${Number.isFinite(altcoinScore) ? altcoinScore : "Unavailable"}</strong><small>${ui.escapeHtml(altcoinSeasonLabel(altcoinScore))}</small></article>`,
+      `<article><span>Altcoin Season</span><strong>${Number.isFinite(altcoinScore) ? altcoinScore : "Unavailable"}</strong><meter class="gauge gauge--altcoin" data-band="${ui.escapeHtml(altcoinSeasonBand(altcoinScore))}" min="0" max="100" value="${Number.isFinite(altcoinScore) ? Math.min(100, Math.max(0, altcoinScore)).toFixed(0) : 0}"></meter><small>${ui.escapeHtml(altcoinSeasonLabel(altcoinScore))}</small></article>`,
       `<article><span>Total Crypto Cap</span><strong>${formatCompact(totalMarketCap)}</strong></article>`,
       `<article><span>Stablecoin Cap</span><strong>${formatCompact(stablecoinMarketCap)}</strong><small>Provider pending</small></article>`,
       '</div>',
     ].join("");
   }
 
-  async function updateSnapshotCorrelations() {
-    try {
-      const kaspaHistory = await historicalDataService.getHistory("kaspa", 90);
-      await Promise.all(marketSnapshotRows.map(async (asset) => {
-        const row = document.querySelector(`[data-benchmark="${asset.id}"] .correlation-badge`);
-        if (!row) return;
-        try {
-          const benchmarkHistory = await historicalDataService.getHistory(asset.id, 90);
-          const correlation = window.KasBulletCore.analyticsEngine.correlation(kaspaHistory, benchmarkHistory);
-          row.textContent = Number.isFinite(correlation) ? `corr ${correlation.toFixed(2)}` : "corr --";
-        } catch (_) {
-          row.textContent = "corr --";
-        }
-      }));
-    } catch (_) {
-      document.querySelectorAll(".correlation-badge").forEach((row) => {
-        row.textContent = "corr --";
-      });
-    }
+  function updateSnapshotCorrelations(comparisons = stateStore.getState().comparisons) {
+    marketSnapshotRows.forEach((asset) => {
+      const row = document.querySelector(`[data-benchmark="${asset.id}"] .correlation-badge`);
+      const comparison = comparisons?.[asset.id]?.price?.[365];
+      const correlation = comparison?.status === "live"
+        ? window.KasBulletCore.analyticsEngine.correlation(
+          comparison.datasets.primary.map((point) => ({ value: point.value })),
+          comparison.datasets.benchmark.map((point) => ({ value: point.value }))
+        )
+        : null;
+      if (row) row.textContent = Number.isFinite(correlation) ? `corr ${correlation.toFixed(2)}` : "corr --";
+    });
   }
 
   function updateSnapshot({ markets, global }, updatedAt) {
@@ -406,7 +442,8 @@
 
     setText("ribbonPrice", price);
     setText("ribbonPriceNote", `24h ${formatPercent(change)}`);
-    setText("ribbonSync", "Live");
+    setText("ribbonSync", formatSyncedAgo(updatedAt));
+    if (field("ribbonSync")) field("ribbonSync").dataset.status = "live";
     setText("chartPrice", price);
     setText("chartChange", formatPercent(change));
     if (field("chartChange")) field("chartChange").className = `stat-value ${changeClass(change)}`;
@@ -449,14 +486,14 @@
   function updateKaspaSnapshot(kaspaState) {
     const data = kaspaState?.data;
     if (!data) return;
-    setText("networkHealth", data.health || "Unavailable");
+    setText("networkName", data.network || data.health || "Unavailable");
     setText("networkBps", typeof data.bps === "number" ? data.bps.toFixed(2) : "Unavailable");
     setText("networkTps", typeof data.tps === "number" ? data.tps.toFixed(2) : "Unavailable");
-    setText("networkHashrate", formatCompact(data.hashrate));
-    setText("networkDifficulty", formatCompact(data.difficulty));
-    setText("networkSupply", formatCompact(data.circulatingSupply, " KAS"));
+    setText("networkBlocks", formatCompact(data.blocks));
     const healthBand = window.KasBulletCore.analyticsEngine.healthBand(data.networkStrength);
-    setText("ribbonHealth", typeof data.networkStrength === "number" ? `${data.networkStrength}/100` : "Unavailable");
+    setText("ribbonHealthBadge", typeof data.networkStrength === "number" ? String(data.networkStrength) : "--");
+    const healthBadge = field("ribbonHealthBadge");
+    if (healthBadge) healthBadge.dataset.band = healthBand.band;
     setText("ribbonHealthNote", healthBand.label);
     setText("ribbonHashrate", formatCompact(data.hashrate));
     setText("ribbonHashrateNote", "vs 30d avg unavailable");
@@ -466,13 +503,13 @@
   }
 
   function renderChart(points) {
-    latestChartPoints = points;
+    latestChartPoints = validatedChartPoints(points);
     const fallback = document.getElementById("chart-fallback");
     const canvas = document.getElementById("kasChart");
-    const windowReturn = calcReturn(points);
+    const windowReturn = calcReturn(latestChartPoints);
     setText("chartReturn", formatPercent(windowReturn));
 
-    if (!points.length) {
+    if (!latestChartPoints.length) {
       if (canvas) canvas.hidden = true;
       if (fallback) {
         fallback.hidden = false;
@@ -484,7 +521,7 @@
     try {
       if (canvas) canvas.hidden = false;
       if (fallback) fallback.hidden = true;
-      window.KasBulletChart.drawKasChart(canvas, points);
+      scheduleChartDraw(canvas, latestChartPoints, { events: chartEvents, scale: currentChartScale });
       setStatus("primary-chart-status", "live", "Live via CoinGecko");
     } catch (error) {
       if (fallback) {
@@ -493,6 +530,67 @@
       }
       setStatus("primary-chart-status", "error", "Chart temporarily unavailable");
     }
+  }
+
+  function scheduleChartDraw(canvas, points, options) {
+    pendingChartRender = { canvas, points, options };
+    if (chartFrameRequest) return;
+    chartFrameRequest = requestAnimationFrame(() => {
+      chartFrameRequest = null;
+      const render = pendingChartRender;
+      pendingChartRender = null;
+      if (!render?.canvas) return;
+      try {
+        window.KasBulletChart.drawKasChart(render.canvas, render.points, render.options);
+      } catch (error) {
+        const fallback = document.getElementById("chart-fallback");
+        if (fallback) {
+          fallback.hidden = false;
+          fallback.textContent = "Chart temporarily unavailable. Last data fetch remains cached.";
+        }
+        setStatus("primary-chart-status", "error", "Chart temporarily unavailable");
+      }
+    });
+  }
+
+  function renderRangeSlider() {
+    const shell = document.getElementById("chart-range-shell");
+    if (!shell || fullChartHistory.length < 2) return;
+    const selectedStart = latestChartPoints[0]?.date?.getTime() || fullChartHistory[0].date.getTime();
+    const fullStart = fullChartHistory[0].date.getTime();
+    const fullEnd = fullChartHistory[fullChartHistory.length - 1].date.getTime();
+    const range = fullEnd - fullStart || 1;
+    const startPercent = Math.max(0, Math.min(100, ((selectedStart - fullStart) / range) * 100));
+    shell.innerHTML = `
+      <div class="range-sparkline">${smallSparkline(fullChartHistory.map((point) => point.price))}</div>
+      <input type="range" min="0" max="100" value="${startPercent.toFixed(0)}" aria-label="Chart visible range start">
+    `;
+    shell.querySelector("input")?.addEventListener("input", (event) => {
+      const start = fullStart + (Number(event.target.value) / 100) * range;
+      const visible = fullChartHistory.filter((point) => point.date.getTime() >= start);
+      currentTimeframe = "custom";
+      document.querySelectorAll(".timeframe").forEach((button) => button.setAttribute("aria-pressed", "false"));
+      renderChart(visible);
+      renderEventTimeline();
+    });
+  }
+
+  function renderEventTimeline() {
+    const timeline = document.getElementById("chart-event-timeline");
+    if (!timeline) return;
+    const visibleStart = latestChartPoints[0]?.date;
+    const visibleEnd = latestChartPoints[latestChartPoints.length - 1]?.date;
+    const visibleEvents = chartEvents
+      .map((event) => ({ ...event, date: new Date(event.date) }))
+      .filter((event) => !Number.isNaN(event.date.valueOf()) && (!visibleStart || (event.date >= visibleStart && event.date <= visibleEnd)));
+    timeline.innerHTML = visibleEvents.length
+      ? visibleEvents.map((event) => `
+        <button type="button" class="event-pill" title="${ui.escapeHtml(event.description)}">
+          <span>${ui.escapeHtml(event.year)}</span>
+          <strong>${ui.escapeHtml(event.title)}</strong>
+        </button>
+      `).join("")
+      : '<p class="empty-state">No verified events inside the selected range.</p>';
   }
 
   function renderComparisonTerminal(results) {
@@ -526,7 +624,7 @@
   }
 
   function renderComparisonTerminalFromState(comparisons) {
-    const results = ["bitcoin", "ethereum", "solana"]
+    const results = snapshotAssetOrder
       .map((assetId) => comparisons?.[assetId]?.price?.[365])
       .filter(Boolean);
     if (!results.length) {
@@ -591,6 +689,7 @@
 
     if (state.comparisons && (!change || change.path === "initial" || change.path.startsWith("comparisons."))) {
       renderComparisonTerminalFromState(state.comparisons);
+      updateSnapshotCorrelations(state.comparisons);
     }
   }
 
@@ -607,13 +706,19 @@
   }
 
   async function loadChart() {
-    const pressed = document.querySelector(".timeframe[aria-pressed='true']");
-    const timeframe = pressed?.dataset.timeframe || "30";
-    const days = timeframe === "max" ? "max" : Number(timeframe);
     try {
       setStatus("primary-chart-status", "loading", "Loading chart");
-      const points = await historicalDataService.getHistory("kaspa", days);
-      renderChart(points.map((point) => ({ ...point, price: point.value })));
+      if (!fullChartHistory.length) {
+        const [points, events] = await Promise.all([
+          historicalDataService.getHistory("kaspa", "max"),
+          dataService.getKaspaEvents(),
+        ]);
+        fullChartHistory = validatedChartPoints(points.map((point) => ({ ...point, price: point.value })));
+        chartEvents = Array.isArray(events) ? events : [];
+      }
+      renderChart(cutoffForTimeframe(fullChartHistory, currentTimeframe));
+      renderRangeSlider();
+      renderEventTimeline();
       renderBrief(stateStore.getState());
     } catch (error) {
       setStatus("primary-chart-status", "error", "Chart data unavailable");
@@ -658,7 +763,17 @@
       button.addEventListener("click", () => {
         document.querySelectorAll(".timeframe").forEach((item) => item.setAttribute("aria-pressed", "false"));
         button.setAttribute("aria-pressed", "true");
+        currentTimeframe = button.dataset.timeframe || "max";
         loadChart();
+      });
+    });
+
+    document.querySelectorAll("[data-chart-scale]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-chart-scale]").forEach((item) => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        currentChartScale = button.dataset.chartScale || "log";
+        renderChart(latestChartPoints);
       });
     });
 
@@ -680,7 +795,7 @@
     });
 
     window.addEventListener("resize", () => {
-      if (latestChartPoints.length) window.KasBulletChart.drawKasChart(document.getElementById("kasChart"), latestChartPoints);
+      if (latestChartPoints.length) scheduleChartDraw(document.getElementById("kasChart"), latestChartPoints, { events: chartEvents, scale: currentChartScale });
     });
   }
 

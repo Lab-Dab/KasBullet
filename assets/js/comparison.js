@@ -5,21 +5,23 @@
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
-  function normalizePoints(points) {
+  function normalizePoints(points, scale = "log") {
     if (!Array.isArray(points) || points.length === 0) return [];
     const validPoints = points.filter((point) => Number.isFinite(point.price) && point.price > 0 && point.date instanceof Date);
-    const prices = validPoints.map((point) => point.price);
+    const prices = validPoints.map((point) => scale === "log" ? Math.log(point.price) : point.price);
     if (prices.length === 0) return [];
     const min = Math.min(...prices);
     const max = Math.max(...prices);
     const range = max - min || 1;
     return validPoints.map((point) => ({
       ...point,
-      normalized: typeof point.price === "number" ? (point.price - min) / range : 0,
+      normalized: typeof point.price === "number"
+        ? ((scale === "log" ? Math.log(point.price) : point.price) - min) / range
+        : 0,
     }));
   }
 
-  function drawKasChart(canvas, points) {
+  function drawKasChart(canvas, points, { events = [], scale = "log" } = {}) {
     if (!canvas) return;
     const context = canvas.getContext("2d");
     if (!context) return;
@@ -34,7 +36,7 @@
     const padding = { top: 20, right: 24, bottom: 32, left: 52 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
-    const normalized = normalizePoints(points);
+    const normalized = normalizePoints(points, scale);
     const gridColor = "rgba(37, 47, 61, .70)";
     const textColor = getThemeColor("--text-secondary");
     const primaryColor = getThemeColor("--color-primary");
@@ -77,6 +79,26 @@
 
     const first = normalized[0];
     const last = normalized[normalized.length - 1];
+    const startTime = first.date.getTime();
+    const endTime = last.date.getTime();
+    const timeRange = endTime - startTime || 1;
+    events
+      .map((event) => ({ ...event, date: new Date(event.date) }))
+      .filter((event) => !Number.isNaN(event.date.valueOf()) && event.date >= first.date && event.date <= last.date)
+      .forEach((event) => {
+        const eventTime = event.date.getTime();
+        let nearest = normalized[0];
+        normalized.forEach((point) => {
+          if (Math.abs(point.date.getTime() - eventTime) < Math.abs(nearest.date.getTime() - eventTime)) nearest = point;
+        });
+        const markerX = padding.left + ((eventTime - startTime) / timeRange) * chartWidth;
+        const markerY = yFor(nearest);
+        context.beginPath();
+        context.arc(markerX, markerY, 3, 0, Math.PI * 2);
+        context.fillStyle = primaryColor;
+        context.fill();
+      });
+
     context.fillStyle = textColor;
     context.textAlign = "left";
     context.fillText(

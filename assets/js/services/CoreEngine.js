@@ -116,6 +116,8 @@
           });
           return data;
         },
+        getKaspaEvents: () =>
+          this.providerManager.request("localFeed", "getKaspaEvents", {}, "kaspa-events", this.refreshIntervals.macro),
       };
     }
 
@@ -124,7 +126,7 @@
         this.historicalMarketService.getCurrentMarkets(["kaspa", "bitcoin", "ethereum", "solana", "binancecoin", "ripple"])
       );
       this.backgroundPrefetchManager.register("kaspa-intelligence", () => this.kaspaIntelligenceService.getSnapshot());
-      this.backgroundPrefetchManager.register("kaspa-history", () => this.historicalMarketService.getHistory("kaspa", 365));
+      this.backgroundPrefetchManager.register("kaspa-history", () => this.historicalMarketService.getHistory("kaspa", "max"));
       this.assetRegistry.supportedComparisons().forEach((asset) => {
         this.backgroundPrefetchManager.register(`comparison-${asset.id}`, () => this.comparisonEngine.compareKaspaTo(asset.id, 365));
       });

@@ -7,12 +7,15 @@
     return div.innerHTML;
   }
 
-  function renderSectionHeader(targetId, { id, title, statusId, status = "loading", statusText }) {
+  function renderSectionHeader(targetId, { id, title, subtitle, statusId, status = "loading", statusText }) {
     const target = document.getElementById(targetId);
     if (!target) return;
     target.innerHTML = `
       <div class="module-header">
-        <h2 id="${escapeHtml(id)}">${escapeHtml(title)}</h2>
+        <div>
+          <h2 id="${escapeHtml(id)}">${escapeHtml(title)}</h2>
+          ${subtitle ? `<p class="module-subtitle">${escapeHtml(subtitle)}</p>` : ""}
+        </div>
         <span class="module-status" id="${escapeHtml(statusId)}" data-status="${escapeHtml(status)}">${escapeHtml(statusText)}</span>
       </div>
     `;

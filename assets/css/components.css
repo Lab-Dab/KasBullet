@@ -29,6 +29,12 @@
     color:var(--text-primary);
 }
 
+.module-subtitle{
+    margin-top:var(--space-1);
+    color:var(--text-muted);
+    font-size:var(--font-xs);
+}
+
 .module-status{
     display:inline-flex;
     align-items:center;
