@@ -141,6 +141,24 @@
     text-transform:uppercase;
 }
 
+.overlay-toggle{
+    padding:var(--space-2) var(--space-3);
+    border:1px solid var(--border-color);
+    border-radius:var(--radius-small);
+    color:var(--text-secondary);
+    background:rgba(11, 15, 20, .45);
+    font-size:var(--font-xs);
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+
+.overlay-toggle[aria-pressed="true"]{
+    color:var(--color-primary);
+    border-color:rgba(73, 234, 203, .45);
+    background:rgba(73, 234, 203, .10);
+}
+
 .timeframe-group{
     display:inline-flex;
     gap:var(--space-1);
@@ -307,29 +325,9 @@
     gap:var(--space-5);
 }
 
-.cycle-strip{
-    gap:var(--space-5);
-}
-
-.network-status-panel{
-    gap:var(--space-5);
-}
-
-.network-status-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
-    gap:var(--space-4);
-}
-
-.cycle-strip-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
-    gap:var(--space-5);
-}
-
 .chart-stats{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(6, minmax(0, 1fr));
     gap:var(--space-4);
 }
 
@@ -370,9 +368,42 @@
     min-height:360px;
 }
 
+.comparison-chart-shell{
+    position:relative;
+    min-height:420px;
+    margin-bottom:var(--space-5);
+}
+
 .chart-shell canvas{
     width:100% !important;
     height:100% !important;
+}
+
+.comparison-chart-shell canvas{
+    width:100% !important;
+    height:100% !important;
+}
+
+.chart-tooltip{
+    position:absolute;
+    z-index:2;
+    transform:translate(-50%, -100%);
+    pointer-events:none;
+    display:flex;
+    flex-direction:column;
+    gap:var(--space-1);
+    min-width:150px;
+    padding:var(--space-3);
+    border:1px solid rgba(73, 234, 203, .45);
+    border-radius:var(--radius-small);
+    background:rgba(11, 15, 20, .94);
+    color:var(--text-primary);
+    box-shadow:var(--shadow-panel);
+    font-size:var(--font-xs);
+}
+
+.chart-tooltip span{
+    color:var(--text-secondary);
 }
 
 .chart-fallback{

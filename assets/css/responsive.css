@@ -83,8 +83,7 @@
 
 @media (min-width: 768px){
 
-    .ribbon-grid,
-    .cycle-strip-grid{
+    .ribbon-grid{
 
         gap:var(--space-6);
 
@@ -96,7 +95,7 @@
 
     .dashboard-grid{
 
-        grid-template-columns:minmax(300px, 360px) 1fr;
+        grid-template-columns:minmax(260px, 25%) minmax(0, 75%);
 
         gap:var(--space-6);
 
@@ -104,23 +103,11 @@
 
     }
 
-    #kaspa-network-status{
-
-        grid-column:1;
-
-    }
-
     .chart-panel{
 
         grid-column:2;
 
-        grid-row:1 / span 2;
-
-    }
-
-    .cycle-strip{
-
-        grid-column:1 / -1;
+        grid-row:1;
 
     }
 

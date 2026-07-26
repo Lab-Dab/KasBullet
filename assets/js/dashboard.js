@@ -17,6 +17,7 @@
   let chartEvents = [];
   let currentTimeframe = "max";
   let currentChartScale = "log";
+  const activeChartOverlays = new Set(["price", "events", "listings"]);
   let chartFrameRequest = null;
   let pendingChartRender = null;
   const snapshotAssetOrder = ["bitcoin", "ethereum", "solana", "binancecoin", "ripple"];
@@ -198,7 +199,7 @@
   function renderSectionHeaders() {
     ui.renderSectionHeader("ribbon-header", {
       id: "ribbon-title",
-      title: "Live Intelligence Ribbon",
+      title: "KasBullet Intelligence",
       statusId: "ribbon-status",
       statusText: "Preparing data",
     });
@@ -208,25 +209,12 @@
       statusId: "market-snapshot-status",
       statusText: "Preparing snapshot",
     });
-    ui.renderSectionHeader("kaspa-network-status-header", {
-      id: "kaspa-network-status-title",
-      title: "Kaspa Network Status",
-      statusId: "kaspa-network-status-status",
-      statusText: "Preparing network",
-    });
     ui.renderSectionHeader("primary-chart-header", {
       id: "primary-chart-title",
       title: "Kaspa Market Terminal",
       subtitle: "Price Since Genesis",
       statusId: "primary-chart-status",
       statusText: "Preparing chart",
-    });
-    ui.renderSectionHeader("cycle-strip-header", {
-      id: "cycle-strip-title",
-      title: "Cycle Strip",
-      statusId: "cycle-strip-status",
-      status: "unavailable",
-      statusText: "Models not enabled",
     });
     ui.renderSectionHeader("market-intelligence-header", {
       id: "market-intelligence-title",
@@ -252,12 +240,11 @@
       statusId: "network-intelligence-status",
       statusText: "Preparing network data",
     });
-    ui.renderSectionHeader("cycle-intelligence-header", {
-      id: "cycle-intelligence-title",
+    ui.renderSectionHeader("market-cap-terminal-header", {
+      id: "market-cap-terminal-title",
       title: "Kaspa Market Cap Terminal",
-      statusId: "cycle-intelligence-status",
-      status: "unavailable",
-      statusText: "Models not enabled",
+      statusId: "market-cap-terminal-status",
+      statusText: "Preparing market cap model",
     });
     ui.renderSectionHeader("market-intelligence-summary-header", {
       id: "market-intelligence-summary-title",
@@ -287,13 +274,18 @@
       '</div>',
       '<button type="button" class="toolbar-button" data-chart-scale="log" aria-pressed="true">Log</button>',
       '<button type="button" class="toolbar-button" data-chart-scale="linear" aria-pressed="false">Linear</button>',
-      ui.toolbarButton({ label: "Overlays", disabled: true }),
     ].join("");
     document.getElementById("terminal-legend").innerHTML = [
       '<span>KAS price since genesis</span>',
       '<span>Log scale default</span>',
     ].join("");
-    document.getElementById("terminal-overlays").innerHTML = '<span>Overlays unavailable until verified secondary series are connected</span>';
+    document.getElementById("terminal-overlays").innerHTML = [
+      '<button type="button" class="overlay-toggle" data-overlay="price" aria-pressed="true">Price</button>',
+      '<button type="button" class="overlay-toggle" data-overlay="marketCap" aria-pressed="false">Market Cap</button>',
+      '<button type="button" class="overlay-toggle" data-overlay="supply" aria-pressed="false">Supply</button>',
+      '<button type="button" class="overlay-toggle" data-overlay="events" aria-pressed="true">Major Upgrades</button>',
+      '<button type="button" class="overlay-toggle" data-overlay="listings" aria-pressed="true">Exchange Listings</button>',
+    ].join("");
   }
 
   function renderInitialState() {
@@ -308,7 +300,9 @@
       '</article>',
       ui.metricCard({ label: "KAS Price", value: "Loading", note: "24h --", field: "ribbonPrice", noteField: "ribbonPriceNote", jump: "#primary-chart-header" }),
       ui.metricCard({ label: "Hashrate", value: "Loading", note: "vs 30d avg unavailable", field: "ribbonHashrate", noteField: "ribbonHashrateNote", jump: "#network-intelligence" }),
-      ui.metricCard({ label: "Fear & Greed", value: "Loading", note: "Alternative.me", field: "ribbonFearGreed", noteField: "ribbonFearGreedNote", jump: "#market-intelligence" }),
+      ui.metricCard({ label: "Difficulty", value: "Loading", note: "Kaspa Intelligence", field: "ribbonDifficulty", noteField: "ribbonDifficultyNote", jump: "#network-intelligence" }),
+      ui.metricCard({ label: "Market Cap", value: "Loading", note: "CoinGecko", field: "ribbonMarketCap", noteField: "ribbonMarketCapNote", jump: "#market-cap-terminal" }),
+      ui.metricCard({ label: "24H Volume", value: "Loading", note: "CoinGecko", field: "ribbonVolume", noteField: "ribbonVolumeNote", jump: "#market-intelligence" }),
       ui.metricCard({ label: "Latest Alert", value: "No active alerts", note: "Unread feed", field: "ribbonAlert", noteField: "ribbonAlertNote", jump: "#market-intelligence-feed" }),
     ].join("");
 
@@ -316,28 +310,24 @@
       ui.marketRow({ label: asset.label, value: asset.provider === "coingecko" ? "Loading" : "Unavailable", change: "--" })
     ).join("");
 
-    document.getElementById("kaspa-network-status-grid").innerHTML = [
-      ui.statCard({ label: "Network", value: "Loading", source: "Kaspa Intelligence", field: "networkName" }),
-      ui.statCard({ label: "BPS", value: "Loading", source: "Kaspa Intelligence", field: "networkBps" }),
-      ui.statCard({ label: "TPS", value: "Unavailable", source: "Kaspa Intelligence", field: "networkTps" }),
-      ui.statCard({ label: "Blocks", value: "Loading", source: "Kaspa Intelligence", field: "networkBlocks" }),
-    ].join("");
-
-    document.getElementById("cycle-strip-grid").innerHTML = [
-      "Cycle Score",
-      "Market Risk",
-      "Conviction",
-      "Liquidity",
-      "Network Strength",
-    ].map((label) => ui.metricCard({ label, value: "Unavailable", note: "Future intelligence container" })).join("");
-
     document.getElementById("chart-stats").innerHTML = [
-      ui.statCard({ label: "KAS Price", value: "Loading", source: "CoinGecko", field: "chartPrice" }),
-      ui.statCard({ label: "Window Return", value: "Loading", source: "Selected timeframe", field: "chartReturn" }),
-      ui.statCard({ label: "24h Change", value: "Loading", source: "CoinGecko", field: "chartChange" }),
+      ui.statCard({ label: "Current Price", value: "Loading", source: "CoinGecko", field: "chartPrice" }),
+      ui.statCard({ label: "ATH", value: "Loading", source: "Historical series", field: "chartAth" }),
+      ui.statCard({ label: "Market Cap", value: "Loading", source: "CoinGecko", field: "chartMarketCap" }),
+      ui.statCard({ label: "Supply", value: "Loading", source: "CoinGecko", field: "chartSupply" }),
+      ui.statCard({ label: "Network", value: "Loading", source: "Kaspa Intelligence", field: "chartNetwork" }),
+      ui.statCard({ label: "Volume", value: "Loading", source: "CoinGecko", field: "chartVolume" }),
     ].join("");
 
-    document.getElementById("kaspa-comparison-grid").innerHTML = ui.loadingSkeleton("Loading Kaspa comparison context.");
+    document.getElementById("kaspa-comparison-grid").innerHTML = [
+      '<div class="comparison-chart-shell">',
+      '<canvas id="comparisonChart" aria-label="Normalized comparison chart"></canvas>',
+      '<div class="chart-fallback" id="comparison-chart-fallback" hidden></div>',
+      '</div>',
+      '<div class="comparison-card-grid" id="comparison-card-grid">',
+      ui.loadingSkeleton("Loading Kaspa comparison context."),
+      '</div>',
+    ].join("");
 
     document.getElementById("market-grid").innerHTML = ui.intelligencePanel({
       title: "Market Intelligence",
@@ -363,7 +353,13 @@
       statusId: "network-panel-status",
     });
 
-    document.getElementById("cycle-grid").innerHTML = '<p class="empty-state">Market cap ladder data is unavailable until live ranking thresholds are connected.</p>';
+    document.getElementById("market-cap-terminal-grid").innerHTML = ui.intelligencePanel({
+      title: "Market Cap Terminal",
+      headline: "Loading",
+      chartLabel: "Market cap comparison model container",
+      insight: "Implied price scenarios use current KAS circulating supply and live peer market caps.",
+      statusId: "market-cap-panel-status",
+    });
 
     document.getElementById("summary-panel").innerHTML =
       '<p>KasBullet Brief is preparing objective market conditions. Not analysis or advice.</p>';
@@ -445,8 +441,13 @@
     setText("ribbonSync", formatSyncedAgo(updatedAt));
     if (field("ribbonSync")) field("ribbonSync").dataset.status = "live";
     setText("chartPrice", price);
-    setText("chartChange", formatPercent(change));
-    if (field("chartChange")) field("chartChange").className = `stat-value ${changeClass(change)}`;
+    setText("chartMarketCap", formatCompact(kaspa?.market_cap));
+    setText("chartSupply", formatCompact(kaspa?.circulating_supply, " KAS"));
+    setText("chartVolume", formatCompact(kaspa?.total_volume));
+    setText("ribbonMarketCap", formatCompact(kaspa?.market_cap));
+    setText("ribbonMarketCapNote", `${Number.isFinite(kaspaDominance) ? kaspaDominance.toFixed(4) : "--"}% dominance`);
+    setText("ribbonVolume", formatCompact(kaspa?.total_volume));
+    setText("ribbonVolumeNote", "24h spot volume");
     const marketHeadline = document.querySelector("#market-grid .panel-headline .stat-value");
     const supplyHeadline = document.querySelector("#supply-grid .panel-headline .stat-value");
     if (marketHeadline) marketHeadline.textContent = price;
@@ -466,6 +467,8 @@
     setStatus("market-panel-status", "live", typeof kaspaDominance === "number" ? `${kaspaDominance.toFixed(4)}% dominance` : formatLastUpdated(updatedAt));
     setStatus("supply-panel-status", "live", "Circulating supply live");
     setStatus("network-panel-status", "unavailable", "Verified provider pending");
+    setStatus("market-cap-panel-status", "live", "Live peer market caps");
+    setStatus("market-cap-terminal-status", "live", "Live market cap model");
   }
 
   function updateSystemStatus(system) {
@@ -490,6 +493,9 @@
     setText("networkBps", typeof data.bps === "number" ? data.bps.toFixed(2) : "Unavailable");
     setText("networkTps", typeof data.tps === "number" ? data.tps.toFixed(2) : "Unavailable");
     setText("networkBlocks", formatCompact(data.blocks));
+    setText("chartNetwork", data.health || data.network || "Live");
+    setText("ribbonDifficulty", formatCompact(data.difficulty));
+    setText("ribbonDifficultyNote", "Kaspa network");
     const healthBand = window.KasBulletCore.analyticsEngine.healthBand(data.networkStrength);
     setText("ribbonHealthBadge", typeof data.networkStrength === "number" ? String(data.networkStrength) : "--");
     const healthBadge = field("ribbonHealthBadge");
@@ -497,7 +503,6 @@
     setText("ribbonHealthNote", healthBand.label);
     setText("ribbonHashrate", formatCompact(data.hashrate));
     setText("ribbonHashrateNote", "vs 30d avg unavailable");
-    setStatus("kaspa-network-status-status", "live", formatLastUpdated(kaspaState.updatedAt));
     setStatus("network-intelligence-status", "live", formatLastUpdated(kaspaState.updatedAt));
     setStatus("network-panel-status", "live", "Kaspa Intelligence connected");
   }
@@ -521,7 +526,9 @@
     try {
       if (canvas) canvas.hidden = false;
       if (fallback) fallback.hidden = true;
-      scheduleChartDraw(canvas, latestChartPoints, { events: chartEvents, scale: currentChartScale });
+      const ath = latestChartPoints.reduce((max, point) => Math.max(max, point.price), 0);
+      setText("chartAth", formatPrice(ath));
+      scheduleChartDraw(canvas, latestChartPoints, { events: chartEvents, scale: currentChartScale, overlays: activeChartOverlays });
       setStatus("primary-chart-status", "live", "Live via CoinGecko");
     } catch (error) {
       if (fallback) {
@@ -617,9 +624,15 @@
         </article>
       `;
     });
-    document.getElementById("kaspa-comparison-grid").innerHTML = cards.length
+    const cardGrid = document.getElementById("comparison-card-grid");
+    if (cardGrid) {
+      cardGrid.innerHTML = cards.length
       ? cards.join("")
       : ui.loadingSkeleton("Comparison data unavailable.");
+    }
+    if (window.KasBulletChart?.drawComparisonChart) {
+      window.KasBulletChart.drawComparisonChart(document.getElementById("comparisonChart"), liveResults);
+    }
     setStatus("kaspa-comparison-status", cards.length ? "live" : "unavailable", cards.length ? "Shared historical cache" : "Comparison data unavailable");
   }
 
@@ -678,7 +691,6 @@
     }
 
     if (state.kaspa.status === "unavailable" && (!change || change.path === "kaspa")) {
-      setStatus("kaspa-network-status-status", "unavailable", "Cached or pending network data");
       setStatus("network-intelligence-status", "unavailable", "Cached or pending network data");
       setStatus("network-panel-status", "unavailable", "Verified provider pending");
     }
@@ -777,6 +789,17 @@
       });
     });
 
+    document.querySelectorAll("[data-overlay]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const overlay = button.dataset.overlay;
+        if (!overlay) return;
+        if (activeChartOverlays.has(overlay)) activeChartOverlays.delete(overlay);
+        else activeChartOverlays.add(overlay);
+        button.setAttribute("aria-pressed", activeChartOverlays.has(overlay) ? "true" : "false");
+        renderChart(latestChartPoints);
+      });
+    });
+
     document.addEventListener("click", (event) => {
       const target = event.target.closest("[data-jump]");
       const destination = target ? document.querySelector(target.dataset.jump) : null;
@@ -795,7 +818,11 @@
     });
 
     window.addEventListener("resize", () => {
-      if (latestChartPoints.length) scheduleChartDraw(document.getElementById("kasChart"), latestChartPoints, { events: chartEvents, scale: currentChartScale });
+      if (latestChartPoints.length) scheduleChartDraw(document.getElementById("kasChart"), latestChartPoints, { events: chartEvents, scale: currentChartScale, overlays: activeChartOverlays });
+      const comparisonResults = snapshotAssetOrder.map((assetId) => stateStore.getState().comparisons?.[assetId]?.price?.[365]).filter(Boolean);
+      if (comparisonResults.length && window.KasBulletChart?.drawComparisonChart) {
+        window.KasBulletChart.drawComparisonChart(document.getElementById("comparisonChart"), comparisonResults.filter((result) => result?.status === "live"));
+      }
     });
   }
 
