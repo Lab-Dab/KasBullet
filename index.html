@@ -3,15 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KasBullet</title>
+  <title>KasBullet | Institutional Intelligence for Kaspa</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <main>
-    <img src="assets/kasbullet-logo.png" alt="KasBullet" class="logo">
-    <h1>KasBullet</h1>
-    <p>Institutional Intelligence for Kaspa</p>
-    <small>Phase 1 Rebuild</small>
+  <header class="site-header">
+    <a class="brand" href="#top"><img src="assets/kasbullet-logo.png" alt=""><span><strong>KasBullet</strong><small>Intelligence for Kaspa</small></span></a>
+    <nav aria-label="Primary navigation"><a href="#markets">Markets</a><a href="#compare">Compare</a><a href="#research">Research</a><a href="#network">Network</a><a href="#alerts">Alerts</a><a href="#about">About</a></nav>
+    <div class="header-tools"><button class="search" type="button">⌕ <span>Search Kaspa, metrics, news...</span><kbd>/</kbd></button><button class="icon-button" type="button" aria-label="Notifications">♧</button><button class="avatar" type="button" aria-label="Account">●</button></div>
+  </header>
+
+  <main id="top">
+    <section class="ribbon panel" aria-labelledby="ribbon-title">
+      <div class="section-heading compact"><div><h1 id="ribbon-title">✕ KASBULLET INTELLIGENCE</h1><span class="live"><i></i> LIVE</span></div><span class="sync">Synced 4s ago</span></div>
+      <div class="ribbon-grid">
+        <div class="health"><span class="health-score">82</span><span><label>Network Health</label><strong>Stable</strong></span></div>
+        <div class="ribbon-stat"><label>KAS PRICE</label><strong>$0.0847</strong><em>▲ 3.2%</em></div>
+        <div class="ribbon-stat"><label>HASHRATE</label><strong>146.4 EH/s</strong><em>▲ 4.1%</em></div>
+        <div class="ribbon-alert"><i></i><span><label>MAJOR ALERT</label><strong>Dormant wallet moved, 2.1y</strong></span></div>
+      </div>
+    </section>
+
+    <section class="primary-grid" id="markets">
+      <aside class="snapshot panel" aria-labelledby="snapshot-title">
+        <div class="section-heading"><div><h2 id="snapshot-title">KasBullet Snapshot</h2><small>Updated 12s ago</small></div></div>
+        <p class="snapshot-note">KAS is outperforming 4 of 5 majors today</p>
+        <div class="market-list">
+          <div class="market-row"><b>BTC</b><span>$64,210</span><em class="up">▲ 1.8%</em><small>corr 0.71</small></div>
+          <div class="market-row"><b>ETH</b><span>$3,412</span><em class="down">▼ 0.6%</em><small>corr 0.64</small></div>
+          <div class="market-row"><b>SOL</b><span>$178.40</span><em class="up">▲ 4.2%</em><small>corr 0.58</small></div>
+          <div class="market-row"><b>BNB</b><span>$591.20</span><em>+0.1%</em><small>corr 0.49</small></div>
+          <div class="market-row"><b>XRP</b><span>$2.14</span><em class="down">▼ 2.1%</em><small>corr 0.41</small></div>
+        </div>
+        <div class="snapshot-grid">
+          <div class="mini-metric"><label>BTC DOMINANCE</label><div class="meter"><i style="width:54%"></i></div><strong>54%</strong></div>
+          <div class="mini-metric"><label>ALTCOIN SEASON</label><div class="meter"><i style="width:38%"></i></div><strong>38</strong></div>
+          <div class="mini-metric"><label>TOTAL MCAP</label><strong>$2.41T</strong></div>
+          <div class="mini-metric"><label>STABLECOIN CAP</label><strong>$168.2B</strong></div>
+        </div>
+      </aside>
+
+      <article class="terminal panel" aria-labelledby="terminal-title">
+        <div class="section-heading"><div><h2 id="terminal-title">Kaspa Market Terminal</h2><small>Price Since Genesis</small></div><span class="live"><i></i> LIVE</span></div>
+        <div class="terminal-controls"><div class="segmented" role="group" aria-label="Chart range"><button class="active" data-range="ALL">ALL</button><button data-range="4Y">4Y</button><button data-range="2Y">2Y</button><button data-range="1Y">1Y</button><button data-range="6M">6M</button><button data-range="3M">3M</button><button data-range="1M">1M</button></div><div class="segmented" role="group" aria-label="Chart scale"><button class="active" data-scale="log">Log</button><button data-scale="linear">Linear</button></div></div>
+        <div class="chart-title"><strong>KASPA PRICE SINCE GENESIS</strong><span>Nov 2021 - Today</span></div>
+        <div class="chart" role="img" aria-label="Kaspa price history from genesis to today"><div class="y-axis"><span>1.00000</span><span>0.10000</span><span>0.01000</span><span>0.00100</span><span>0.00010</span><span>0.00001</span></div><svg viewBox="0 0 900 250" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#49eacb" stop-opacity=".28"/><stop offset="1" stop-color="#49eacb" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 225 L15 198 L28 212 L42 195 L56 204 L70 208 L84 194 L100 200 L116 185 L132 179 L145 184 L160 157 L175 163 L190 148 L205 151 L220 135 L237 141 L252 126 L270 137 L288 132 L306 142 L322 130 L340 120 L357 109 L375 116 L390 100 L410 112 L427 99 L445 105 L462 86 L480 78 L498 88 L516 65 L534 73 L550 61 L570 75 L588 50 L605 58 L625 49 L644 64 L662 40 L680 53 L699 35 L717 50 L735 30 L754 39 L772 22 L790 31 L808 15 L828 25 L846 8 L864 20 L884 5 L900 16 L900 250 L0 250 Z"/><path class="line" d="M0 225 L15 198 L28 212 L42 195 L56 204 L70 208 L84 194 L100 200 L116 185 L132 179 L145 184 L160 157 L175 163 L190 148 L205 151 L220 135 L237 141 L252 126 L270 137 L288 132 L306 142 L322 130 L340 120 L357 109 L375 116 L390 100 L410 112 L427 99 L445 105 L462 86 L480 78 L498 88 L516 65 L534 73 L550 61 L570 75 L588 50 L605 58 L625 49 L644 64 L662 40 L680 53 L699 35 L717 50 L735 30 L754 39 L772 22 L790 31 L808 15 L828 25 L846 8 L864 20 L884 5 L900 16"/><g class="events"><circle cx="18" cy="218" r="5"/><circle cx="155" cy="174" r="5"/><circle cx="302" cy="138" r="5"/><circle cx="450" cy="98" r="5"/><circle cx="610" cy="55" r="5"/><circle cx="770" cy="24" r="5"/><circle cx="900" cy="16" r="5"/></g></svg><div class="x-axis"><span>Nov 7, 2021<br><b>Genesis<br>Launch</b></span><span>Jun 30, 2022<br><b>10 BPS<br>Upgrade</b></span><span>Jan 8, 2023<br><b>Crescendo<br>Hard Fork</b></span><span>Jul 25, 2023<br><b>KRC-20<br>Launch</b></span><span>Aug 3, 2023<br><b>Wrangling<br>Upgrade</b></span><span>Feb 1, 2024<br><b>v0.11.0<br>Upgrade</b></span><span>Oct 16, 2024<br><b>Mojor Exchanges<br>Listings</b></span><span>May 16, 2025<br><b>v0.12.1<br>Released</b></span></div></div>
+        <div class="terminal-stats"><div><label>Current Price</label><strong>$0.1274</strong><em>▲ 3.61%</em></div><div><label>ATH (USD)</label><strong>$0.1923</strong><small>Dec 1, 2024</small></div><div><label>Market Cap</label><strong>$3.19B</strong><em>▲ 3.24%</em></div><div><label>Circulating Supply</label><strong>25.048 KAS</strong><small>89.45% of Max</small></div><div><label>24H Volume</label><strong>$57.48M</strong><em>▲ 8.11%</em></div><div><label>Network Strength</label><strong>95.8%</strong><small>Strong</small></div></div>
+      </article>
+    </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>
