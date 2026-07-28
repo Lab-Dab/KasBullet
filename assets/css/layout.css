@@ -202,6 +202,15 @@ body{
 
 }
 
+.intelligence-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    align-items:stretch;
+}
+
+.intelligence-hero{
+    background:linear-gradient(135deg, var(--bg-surface), rgba(20, 26, 34, .72));
+}
+
 
 /* ==========================================================
    Generic module box
@@ -229,4 +238,8 @@ body{
 
     min-height:520px;
 
+}
+
+@media (max-width: 767px){
+    .intelligence-grid{grid-template-columns:1fr;}
 }

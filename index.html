@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KasBullet | Institutional Intelligence for Kaspa</title>
-  <meta name="description" content="KasBullet is an institutional intelligence terminal for Kaspa, built around objective market, supply, network, comparison, summary and alert containers.">
+  <meta name="description" content="Institutional market, network, supply and comparison intelligence for Kaspa.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,120 +18,32 @@
 <body>
   <header class="app-header">
     <div class="header-container">
-      <a class="brand" href="#top" aria-label="KasBullet home">
-        <img src="assets/kasbullet-logo.png" class="brand-mark" alt="">
-        <span class="brand-text">KasBullet</span>
-      </a>
-      <nav class="main-nav" aria-label="Primary navigation">
-        <a href="#market-intelligence">Markets</a>
-        <a href="#kaspa-comparison-terminal">Compare</a>
-        <a href="#network-intelligence">Network</a>
-        <a href="#market-intelligence-feed">Intelligence</a>
-        <a href="#research-workspace">Research</a>
-        <a href="#lab-workspace">Lab</a>
-        <a href="#search-workspace">Search</a>
-        <a href="#user-workspace">User</a>
-      </nav>
+      <a class="brand" href="#top" aria-label="KasBullet home"><img src="assets/kasbullet-logo.png" class="brand-mark" alt=""><span class="brand-text">KasBullet</span></a>
+      <nav class="main-nav" aria-label="Primary navigation"><a href="#kaspa-market-terminal">Markets</a><a href="#kaspa-comparison-terminal">Compare</a><a href="#network-intelligence">Network</a><a href="#market-intelligence-feed">Intelligence</a></nav>
     </div>
   </header>
 
   <main class="dashboard" id="top">
     <h1 class="visually-hidden">KasBullet institutional intelligence terminal for Kaspa</h1>
 
-    <section class="module intelligence-strip" id="live-intelligence-ribbon" aria-labelledby="ribbon-title">
-      <div id="ribbon-header"></div>
-      <div class="ribbon-grid" id="ribbon-grid" aria-live="polite"></div>
+    <section class="module intelligence-hero" id="kasbullet-intelligence" aria-labelledby="ribbon-title"><div id="ribbon-header"></div><div class="ribbon-grid" id="ribbon-grid" aria-live="polite"></div></section>
+
+    <section class="dashboard-grid primary-workspace" aria-label="Kaspa market overview">
+      <aside class="module" id="kasbullet-snapshot" aria-labelledby="market-snapshot-title"><div id="market-snapshot-header"></div><div class="market-list" id="market-snapshot" aria-live="polite"></div></aside>
+      <article class="module module-large chart-panel" id="kaspa-market-terminal" aria-labelledby="primary-chart-title"><div id="primary-chart-header"></div><div class="chart-toolbar" id="chart-toolbar" aria-label="Kaspa market terminal controls"></div><div class="terminal-legend" id="terminal-legend"></div><div class="terminal-overlays" id="terminal-overlays"></div><div class="chart-stats" id="chart-stats" aria-live="polite"></div><div class="chart-shell"><canvas id="kasChart" aria-label="KAS price chart"></canvas><div class="chart-fallback" id="chart-fallback" hidden></div></div><div class="range-shell" id="chart-range-shell"></div><div class="chart-event-timeline" id="chart-event-timeline"></div></article>
     </section>
 
-    <section class="dashboard-grid primary-workspace" id="main-dashboard" aria-label="Main dashboard">
-      <aside class="module" aria-labelledby="market-snapshot-title">
-        <div id="market-snapshot-header"></div>
-        <div class="market-list" id="market-snapshot" aria-live="polite"></div>
-      </aside>
+    <section class="module" id="kaspa-comparison-terminal" aria-labelledby="kaspa-comparison-title"><div id="kaspa-comparison-header"></div><div class="comparison-terminal-grid" id="kaspa-comparison-grid" aria-live="polite"></div></section>
 
-      <article class="module module-large chart-panel" id="kaspa-market-terminal" aria-labelledby="primary-chart-title">
-        <div id="primary-chart-header"></div>
-        <div class="chart-toolbar" id="chart-toolbar" aria-label="Kaspa market terminal toolbar"></div>
-        <div class="terminal-legend" id="terminal-legend" aria-label="Kaspa market terminal legend"></div>
-        <div class="terminal-overlays" id="terminal-overlays" aria-label="Kaspa market terminal overlays"></div>
-        <div class="chart-stats" id="chart-stats" aria-live="polite"></div>
-        <div class="chart-shell">
-          <canvas id="kasChart" aria-label="KAS price chart"></canvas>
-          <div class="chart-fallback" id="chart-fallback" hidden></div>
-        </div>
-        <div class="range-shell" id="chart-range-shell" aria-label="Kaspa market range selector"></div>
-        <div class="chart-event-timeline" id="chart-event-timeline" aria-label="Kaspa verified event timeline"></div>
-      </article>
+    <section class="dashboard-grid intelligence-grid" aria-label="Market and supply intelligence"><article class="module" id="market-intelligence" aria-labelledby="market-intelligence-title"><div id="market-intelligence-header"></div><div class="stat-grid" id="market-grid"></div></article><article class="module" id="supply-intelligence" aria-labelledby="supply-intelligence-title"><div id="supply-intelligence-header"></div><div class="stat-grid" id="supply-grid"></div></article></section>
+    <section class="dashboard-grid intelligence-grid" aria-label="Network and market cap intelligence"><article class="module" id="network-intelligence" aria-labelledby="network-intelligence-title"><div id="network-intelligence-header"></div><div class="stat-grid" id="network-grid"></div></article><article class="module" id="market-cap-terminal" aria-labelledby="market-cap-terminal-title"><div id="market-cap-terminal-header"></div><div class="stat-grid" id="market-cap-terminal-grid"></div></article></section>
 
-    </section>
-
-    <section class="module" id="kaspa-comparison-terminal" aria-labelledby="kaspa-comparison-title">
-      <div id="kaspa-comparison-header"></div>
-      <div class="comparison-terminal-grid" id="kaspa-comparison-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="module" id="market-intelligence" aria-labelledby="market-intelligence-title">
-      <div id="market-intelligence-header"></div>
-      <div class="stat-grid" id="market-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="module" id="supply-intelligence" aria-labelledby="supply-intelligence-title">
-      <div id="supply-intelligence-header"></div>
-      <div class="stat-grid" id="supply-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="module" id="network-intelligence" aria-labelledby="network-intelligence-title">
-      <div id="network-intelligence-header"></div>
-      <div class="stat-grid" id="network-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="module" id="market-cap-terminal" aria-labelledby="market-cap-terminal-title">
-      <div id="market-cap-terminal-header"></div>
-      <div class="stat-grid" id="market-cap-terminal-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="module executive-summary" id="market-intelligence-summary" aria-labelledby="market-intelligence-summary-title">
-      <div id="market-intelligence-summary-header"></div>
-      <div class="summary-panel" id="summary-panel" aria-live="polite"></div>
-    </section>
-
-    <section class="module" id="market-intelligence-feed" aria-labelledby="market-intelligence-feed-title">
-      <div id="market-intelligence-feed-header"></div>
-      <div class="feed-category-grid" id="feed-category-grid"></div>
-      <div class="alerts-grid" id="alerts-grid" aria-live="polite"></div>
-    </section>
+    <section class="module executive-summary" id="market-intelligence-summary" aria-labelledby="market-intelligence-summary-title"><div id="market-intelligence-summary-header"></div><div class="summary-panel" id="summary-panel" aria-live="polite"></div></section>
+    <section class="module" id="market-intelligence-feed" aria-labelledby="market-intelligence-feed-title"><div id="market-intelligence-feed-header"></div><div class="feed-category-grid" id="feed-category-grid"></div><div class="alerts-grid" id="alerts-grid" aria-live="polite"></div></section>
   </main>
 
-  <footer class="site-footer">
-    <p>KasBullet aggregates objective public market and network context for research. Not financial advice.</p>
-    <p>Powered by the KasBullet Core Intelligence Engine and modular provider architecture.</p>
-  </footer>
+  <footer class="site-footer"><p>KasBullet aggregates objective public market and network context for research. Not financial advice.</p><p>Powered by the KasBullet Core Intelligence Engine and modular provider architecture.</p></footer>
 
-  <section class="workspace-shell" id="compare-workspace" aria-label="Compare workspace" hidden></section>
-  <section class="workspace-shell" id="research-workspace" aria-label="Research workspace" hidden></section>
-  <section class="workspace-shell" id="lab-workspace" aria-label="Lab workspace" hidden></section>
-  <section class="workspace-shell" id="search-workspace" aria-label="Search workspace" hidden></section>
-  <section class="workspace-shell" id="user-workspace" aria-label="User profile workspace" hidden></section>
-
-  <script src="assets/js/services/CacheManager.js"></script>
-  <script src="assets/js/services/EventBus.js"></script>
-  <script src="assets/js/services/StateStore.js"></script>
-  <script src="assets/js/services/AssetRegistry.js"></script>
-  <script src="assets/js/services/ProviderManager.js"></script>
-  <script src="assets/js/services/TimeSeriesEngine.js"></script>
-  <script src="assets/js/services/AnalyticsEngine.js"></script>
-  <script src="assets/js/services/IntelligenceEngine.js"></script>
-  <script src="assets/js/services/RefreshScheduler.js"></script>
-  <script src="assets/js/services/CompareService.js"></script>
-  <script src="assets/js/services/HistoricalMarketService.js"></script>
-  <script src="assets/js/services/MacroMarketService.js"></script>
-  <script src="assets/js/services/KaspaIntelligenceService.js"></script>
-  <script src="assets/js/services/HealthMonitor.js"></script>
-  <script src="assets/js/services/CoreEngine.js"></script>
-  <script src="assets/js/services.js"></script>
-  <script src="assets/js/components.js"></script>
-  <script src="assets/js/comparison.js"></script>
-  <script src="assets/js/dashboard.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/services/CacheManager.js"></script><script src="assets/js/services/EventBus.js"></script><script src="assets/js/services/StateStore.js"></script><script src="assets/js/services/AssetRegistry.js"></script><script src="assets/js/services/ProviderManager.js"></script><script src="assets/js/services/TimeSeriesEngine.js"></script><script src="assets/js/services/AnalyticsEngine.js"></script><script src="assets/js/services/IntelligenceEngine.js"></script><script src="assets/js/services/RefreshScheduler.js"></script><script src="assets/js/services/CompareService.js"></script><script src="assets/js/services/HistoricalMarketService.js"></script><script src="assets/js/services/MacroMarketService.js"></script><script src="assets/js/services/KaspaIntelligenceService.js"></script><script src="assets/js/services/HealthMonitor.js"></script><script src="assets/js/services/CoreEngine.js"></script><script src="assets/js/services.js"></script><script src="assets/js/components.js"></script><script src="assets/js/comparison.js"></script><script src="assets/js/dashboard.js"></script><script src="assets/js/app.js"></script>
 </body>
 </html>
